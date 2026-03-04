@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAP Design System Component Mapping</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      overflow: hidden;
+      color: #1a1a2e;
+    }
+
+    #app { display: flex; width: 100vw; height: 100vh; }
+
+    /* ─── SIDEBAR ────────────────────────────────────────── */
+    #sidebar {
+      width: 272px;
+      min-width: 272px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e8e8e8;
+      box-shadow: 2px 0 12px rgba(0,0,0,.06);
+      z-index: 10;
+    }
+
+    .sb-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .sb-header h1 {
+      font-size: 13px; font-weight: 700; color: #111; letter-spacing: -.01em;
+    }
+    .sb-header p {
+      font-size: 11px; color: #888; margin-top: 3px;
+    }
+
+    .sb-search {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .sb-search input {
+      width: 100%; padding: 7px 10px;
+      border: 1px solid #e0e0e0; border-radius: 6px;
+      font-size: 12px; outline: none; color: #222;
+      transition: border-color .2s;
+      background: #fafafa;
+    }
+    .sb-search input:focus { border-color: #0078d4; background: #fff; }
+
+    #legend {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .legend-heading {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: #aaa; margin-bottom: 7px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 7px; cursor: pointer;
+      transition: filter .12s; border: 1.5px solid transparent;
+      margin-bottom: 3px;
+    }
+    .legend-item:hover { filter: brightness(.96); }
+    .legend-item.active { border-color: rgba(0,0,0,.15); }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label { font-size: 13px; font-weight: 600; flex: 1; }
+    .legend-count {
+      font-size: 11px;
+      background: rgba(255,255,255,.6); border-radius: 10px;
+      padding: 1px 7px; font-weight: 700;
+    }
+
+    #info-panel {
+      flex: 1; overflow-y: auto; padding: 14px;
+    }
+    .info-empty {
+      margin-top: 36px; text-align: center;
+      color: #bbb; font-size: 12px; line-height: 1.6;
+    }
+    .info-empty svg { opacity: .3; margin-bottom: 10px; }
+
+    .info-name {
+      font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px;
+    }
+    .info-badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 10px; border-radius: 12px;
+      font-size: 10px; font-weight: 600; color: #fff;
+      margin-bottom: 14px;
+    }
+    .info-section {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: #aaa;
+      margin: 12px 0 5px;
+    }
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px 4px 7px;
+      border-radius: 6px; margin: 2px; cursor: pointer;
+      font-size: 11px; font-weight: 500;
+      transition: filter .15s, transform .1s;
+      border: 1px solid transparent;
+    }
+    .info-chip:hover { filter: brightness(.94); transform: translateY(-1px); }
+    .info-chip-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* ─── GRAPH ──────────────────────────────────────────── */
+    #graph-wrap { flex: 1; position: relative; }
+    #graph-wrap svg { width: 100%; height: 100%; }
+
+    .hull-path {
+      fill-opacity: .38; stroke-width: 1.5;
+      stroke-dasharray: 6,5; stroke-opacity: .45;
+    }
+    .cat-label-text {
+      font-size: 7.5px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: .1em;
+      pointer-events: none;
+    }
+    .cat-label-sub {
+      pointer-events: none;
+    }
+    .cat-label-bg {
+      fill: #fff; rx: 4px;
+      pointer-events: none;
+    }
+
+    .link { stroke-opacity: .55; }
+
+    .node-g { cursor: pointer; }
+    .node-g circle { transition: r .15s; }
+    .node-g:hover circle { r: 6px; }
+    .node-label {
+      font-size: 8px; font-weight: 600;
+      pointer-events: none; user-select: none;
+    }
+
+    /* ─── CONTROLS ───────────────────────────────────────── */
+    #controls {
+      position: absolute; bottom: 18px; right: 18px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .ctrl-btn {
+      width: 30px; height: 30px;
+      background: #fff; border: 1px solid #e0e0e0;
+      border-radius: 6px; font-size: 15px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: background .12s;
+      color: #555;
+    }
+    .ctrl-btn:hover { background: #f0f0f0; }
+
+    /* ─── TOOLTIP ────────────────────────────────────────── */
+    #tip {
+      position: absolute; pointer-events: none; z-index: 99;
+      background: rgba(17,24,39,.88); color: #fff;
+      padding: 7px 11px; border-radius: 7px; font-size: 11px;
+      opacity: 0; transition: opacity .15s;
+      max-width: 220px; line-height: 1.5;
+    }
+
+    /* ─── HINT BAR ───────────────────────────────────────── */
+    #hint {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,.92); border: 1px solid #e8e8e8;
+      padding: 6px 16px; border-radius: 20px; font-size: 11px; color: #888;
+      pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      white-space: nowrap;
+    }
+
+    /* ─── BOTTOM LEGEND ─────────────────────────────────── */
+    #bottom-legend {
+      position: absolute; bottom: 18px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 20px;
+      background: rgba(255,255,255,.92); border: 1px solid #e8e8e8;
+      padding: 7px 18px; border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      pointer-events: none; white-space: nowrap;
+    }
+    .bl-item {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .bl-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .bl-label {
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────── */
+    #info-panel::-webkit-scrollbar { width: 5px; }
+    #info-panel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-header">
+      <h1>CAP Design System Mapping</h1>
+      <p>Click a node to explore connections</p>
+    </div>
+    <div class="sb-search">
+      <input id="search" type="text" placeholder="Search components…" />
+    </div>
+    <div id="legend"></div>
+    <div id="info-panel">
+      <div class="info-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+          <circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/>
+        </svg><br>Select a component<br>to see its connections
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAPH -->
+  <div id="graph-wrap">
+    <svg id="svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4"
+          markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#c8c8c8"/>
+        </marker>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+    </svg>
+    <div id="controls">
+      <button class="ctrl-btn" id="btn-in"  title="Zoom in">+</button>
+      <button class="ctrl-btn" id="btn-out" title="Zoom out">−</button>
+      <button class="ctrl-btn" id="btn-fit" title="Fit view">⊡</button>
+    </div>
+    <div id="hint">Click any node to highlight its connections</div>
+    <div id="tip"></div>
+    <div id="bottom-legend"></div>
+  </div>
+
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════
+// CATEGORY DEFINITIONS
+// ════════════════════════════════════════════════════════
+const CAT = {
+  "Foundations": {
+    color: "#2e7d52", light: "#e6f4ec",
+    cx: .50, cy: .46, sub: "Atomic Layer"
+  },
+  "Input & Controls": {
+    color: "#8a6d00", light: "#fdf5d0",
+    cx: .10, cy: .50, sub: "Action Layer", xyStrength: 0.40, clusterStrength: 0.30
+  },
+  "Layout & Surfaces": {
+    color: "#b83232", light: "#fde8e8",
+    cx: .50, cy: .08, padScale: 0.9, xyStrength: 0.90, clusterStrength: 0.70, sub: "Shell Layer"
+  },
+  "Navigation & Feedback": {
+    color: "#b5336e", light: "#fce4ef",
+    cx: .90, cy: .50, sub: "Wayfinding Layer"
+  },
+  "Data & Expression": {
+    color: "#1a5fa8", light: "#e3edf8",
+    cx: .50, cy: .90, sub: "Product Specific Layer"
+  }
+};
+
+// ════════════════════════════════════════════════════════
+// COMPONENT DATA  (name, category, depends-on relations)
+// ════════════════════════════════════════════════════════
+const RAW = [
+  // ── Foundations ──────────────────────────────────────
+  { name:"Grid System",       cat:"Foundations",             deps:[] },
+  { name:"Appearance",        cat:"Foundations",             deps:["Grid System"] },
+  { name:"Fluent Iconography",cat:"Foundations",             deps:[] },
+  { name:"Fluent Avatars",    cat:"Foundations",             deps:[] },
+  { name:"Fluent Typography", cat:"Foundations",             deps:[] },
+  { name:"Fluent Colors",     cat:"Foundations",             deps:[] },
+  { name:"Fluent Styles",     cat:"Foundations",             deps:["Grid System"] },
+  { name:"Avatar",            cat:"Foundations",             deps:["Fluent Avatars","Fluent Iconography","Fluent Typography","Popover"] },
+  { name:"AvatarGroup",       cat:"Foundations",             deps:["Avatar","Tooltip"] },
+  { name:"Badge",             cat:"Foundations",             deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"Image",             cat:"Foundations",             deps:["Fluent Avatars"] },
+  { name:"Label",             cat:"Foundations",             deps:["Badge","Fluent Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Link",              cat:"Foundations",             deps:["Fluent Colors","Fluent Typography"] },
+
+  // ── Input & Controls ─────────────────────────────────
+  { name:"Accordion",         cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Typography","Fluent Colors"] },
+  { name:"Breadcrumb",        cat:"Input & Controls",        deps:["Fluent Colors","Fluent Iconography","Fluent Typography","Button","Link"] },
+  { name:"Button",            cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Appearance","Fluent Styles"] },
+  { name:"Checkbox",          cat:"Input & Controls",        deps:["Field","Label","Fluent Colors","Fluent Iconography"] },
+  { name:"ComboBox",          cat:"Input & Controls",        deps:["Field","Fluent Typography","Fluent Colors","Appearance","Fluent Styles"] },
+  { name:"CompoundButton",    cat:"Input & Controls",        deps:["Button","Fluent Typography","Fluent Colors","Fluent Iconography","Appearance","Fluent Styles"] },
+  { name:"CounterBadge",      cat:"Input & Controls",        deps:["Badge","Fluent Typography","Fluent Colors","Appearance","Fluent Styles"] },
+  { name:"Dialog",            cat:"Input & Controls",        deps:["Button","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Dropdown",          cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Field",             cat:"Input & Controls",        deps:["Label","Input","InfoLabel","StatusIndicator","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Filter",            cat:"Input & Controls",        deps:["Tag","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"FloatingActionButton",cat:"Input & Controls",      deps:["Button","Popover","Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"InfoLabel",         cat:"Input & Controls",        deps:["Label","Popover","Fluent Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Input",             cat:"Input & Controls",        deps:["Field","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"List",              cat:"Input & Controls",        deps:["Checkbox","Button","Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Menu",              cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"MenuButton",        cat:"Input & Controls",        deps:["Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Persona",           cat:"Input & Controls",        deps:["Avatar","Badge","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance","Fluent Avatars"] },
+  { name:"Popover",           cat:"Input & Controls",        deps:["Link","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"RadioGroup",        cat:"Input & Controls",        deps:["Field","Label","Fluent Colors","Fluent Typography"] },
+  { name:"SearchBox",         cat:"Input & Controls",        deps:["Input","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"SplitButton",       cat:"Input & Controls",        deps:["Button","Fluent Colors","Fluent Typography","Fluent Styles","Appearance"] },
+  { name:"SplitDropdown",     cat:"Input & Controls",        deps:["Dropdown","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Switch",            cat:"Input & Controls",        deps:["Field","Label","Fluent Avatars","Fluent Colors","Fluent Typography"] },
+  { name:"TabList",           cat:"Input & Controls",        deps:["MenuButton","Fluent Iconography","Fluent Colors","Fluent Typography"] },
+  { name:"Tag",               cat:"Input & Controls",        deps:["Avatar","Fluent Iconography","Fluent Colors","Fluent Typography"] },
+  { name:"TagGroup",          cat:"Input & Controls",        deps:["Tag","Fluent Iconography","Fluent Colors","Fluent Typography"] },
+  { name:"TeachingPopover",   cat:"Input & Controls",        deps:["Popover","Button","Fluent Typography","Fluent Colors","Fluent Styles","Appearance"] },
+  { name:"TextArea",          cat:"Input & Controls",        deps:["Field","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles"] },
+  { name:"Toast",             cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"ToggleButton",      cat:"Input & Controls",        deps:["Button","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+
+  // ── Layout & Surfaces ────────────────────────────────
+  { name:"Calendar",          cat:"Layout & Surfaces",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Badge","Button","Link"] },
+  { name:"ColorPicker",       cat:"Layout & Surfaces",       deps:["Fluent Colors","Fluent Typography","Button"] },
+  { name:"DatePicker",        cat:"Layout & Surfaces",       deps:["Calendar","Field","Input","Popover","Button","Fluent Colors","Fluent Typography","Fluent Styles","Appearance"] },
+  { name:"Flyout",            cat:"Layout & Surfaces",       deps:["Nav","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"SpinButton",        cat:"Input & Controls",        deps:["Field","Input","Fluent Iconography","Fluent Colors","Fluent Typography"] },
+  { name:"Spinner",           cat:"Input & Controls",        deps:["Label","Fluent Colors"] },
+
+  // ── Navigation & Feedback ────────────────────────────
+  { name:"Card",              cat:"Navigation & Feedback",   deps:["Avatar","AvatarGroup","Badge","Button","Checkbox","InfoLabel","Link","Persona","RadioGroup","Rating","Skeleton","Switch","Tag","Tooltip","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles","Appearance"] },
+  { name:"Carousel",          cat:"Navigation & Feedback",   deps:["Button","Tooltip","ToggleButton","Fluent Iconography","Fluent Colors","Appearance","Fluent Styles","Fluent Typography"] },
+  { name:"Carousel Nav",      cat:"Navigation & Feedback",   deps:["Carousel","Fluent Iconography","Fluent Colors","Fluent Typography"] },
+  { name:"Divider",           cat:"Navigation & Feedback",   deps:["Fluent Typography","Fluent Colors"] },
+  { name:"Drawer",            cat:"Navigation & Feedback",   deps:["Dialog","Toolbar","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"MessageBar",        cat:"Navigation & Feedback",   deps:["Button","Link","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"Nav",               cat:"Navigation & Feedback",   deps:["Button","Divider","Drawer","Tooltip","MenuButton","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
+  { name:"ProgressBar",       cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography"] },
+  { name:"Skeleton",          cat:"Navigation & Feedback",   deps:["Fluent Colors"] },
+  { name:"Slider",            cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography"] },
+  { name:"StatusIndicator",   cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"SwatchPicker",      cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Iconography"] },
+  { name:"TagPicker",         cat:"Navigation & Feedback",   deps:["ComboBox","Tag","Field","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"Toolbar",           cat:"Navigation & Feedback",   deps:["Divider","SearchBox","Button","Dropdown","Menu","Filter","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"Tooltip",           cat:"Navigation & Feedback",   deps:["Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"Tree",              cat:"Navigation & Feedback",   deps:["Avatar","Button","Checkbox","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+
+  // ── Data & Expression ────────────────────────────────
+  { name:"DataGrid",          cat:"Data & Expression",       deps:["Table","Fluent Typography","Fluent Iconography","Fluent Colors","Appearance","Fluent Styles"] },
+  { name:"KPI",               cat:"Data & Expression",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Rating",            cat:"Data & Expression",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Table",             cat:"Data & Expression",       deps:["Avatar","Checkbox","RadioGroup","Fluent Avatars","Fluent Colors","Fluent Typography"] },
+  { name:"TimePicker",        cat:"Data & Expression",       deps:["ComboBox","Field","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles"] },
+];
+
+// ════════════════════════════════════════════════════════
+// BUILD GRAPH DATA
+// ════════════════════════════════════════════════════════
+const nameMap = {};
+RAW.forEach((c, i) => { nameMap[c.name] = i; });
+
+const nodes = RAW.map((c, i) => ({
+  id: i, name: c.name, cat: c.cat, deps: c.deps
+}));
+
+const links = [];
+RAW.forEach((c, si) => {
+  c.deps.forEach(dep => {
+    const ti = nameMap[dep];
+    if (ti !== undefined) links.push({ source: si, target: ti });
+  });
+});
+
+// ════════════════════════════════════════════════════════
+// LAYOUT
+// ════════════════════════════════════════════════════════
+const container = document.getElementById('graph-wrap');
+let W = container.clientWidth, H = container.clientHeight;
+
+const svg = d3.select('#svg').attr('viewBox', `0 0 ${W} ${H}`);
+const g   = svg.append('g');
+
+// Zoom
+let currentK = 1;
+let zoomSpreadTimer;
+
+const zoom = d3.zoom().scaleExtent([.15, 5]).on('zoom', e => {
+  g.attr('transform', e.transform);
+  const k = e.transform.k;
+  currentK = k;
+
+  // Counter-scale label groups: position (R+8)/k below node, then scale 1/k
+  nodeSel.select('.node-label-g')
+    .attr('transform', `translate(0,${R + 8 / k})`);
+
+  // Debounce simulation force spread (avoid restarting on every scroll tick)
+  clearTimeout(zoomSpreadTimer);
+  zoomSpreadTimer = setTimeout(() => {
+    chargeForce.strength(-140 * k);
+    collideForce.radius(10 * k);
+    linkForce.distance(55 * k);
+    sim.alpha(0.25).restart();
+  }, 120);
+});
+svg.call(zoom);
+
+// Set initial node positions by category
+nodes.forEach(n => {
+  const c = CAT[n.cat];
+  n.x = c.cx * W + (Math.random()-.5)*100;
+  n.y = c.cy * H + (Math.random()-.5)*100;
+});
+
+// ════════════════════════════════════════════════════════
+// SIMULATION
+// ════════════════════════════════════════════════════════
+function clusterForce(alpha) {
+  nodes.forEach(n => {
+    const cfg = CAT[n.cat];
+    const cx = cfg.cx * W;
+    const cy = cfg.cy * H;
+    const strength = cfg.clusterStrength || 0.18;
+    n.vx += (cx - n.x) * strength * alpha;
+    n.vy += (cy - n.y) * strength * alpha;
+  });
+}
+
+const chargeForce  = d3.forceManyBody().strength(-140);
+const collideForce = d3.forceCollide(10);
+const linkForce    = d3.forceLink(links).id(d=>d.id).distance(55).strength(.25);
+
+const sim = d3.forceSimulation(nodes)
+  .force('link',    linkForce)
+  .force('charge',  chargeForce)
+  .force('collide', collideForce)
+  .force('cluster', () => clusterForce(sim.alpha()))
+  .force('x', d3.forceX(n => CAT[n.cat].cx * W).strength(n => CAT[n.cat].xyStrength || .20))
+  .force('y', d3.forceY(n => CAT[n.cat].cy * H).strength(n => CAT[n.cat].xyStrength || .20));
+
+// ════════════════════════════════════════════════════════
+// DRAW
+// ════════════════════════════════════════════════════════
+const hullLayer  = g.append('g').attr('class','hulls');
+const linkLayer  = g.append('g').attr('class','link-layer');
+const nodeLayer  = g.append('g').attr('class','node-layer');
+const labelLayer = g.append('g').attr('class','cat-labels');
+
+// Links
+const linkSel = linkLayer.selectAll('path').data(links).enter().append('path')
+  .attr('class','link')
+  .attr('stroke','#ccc')
+  .attr('stroke-width', 1)
+  .attr('fill','none');
+
+function curvePath(d) {
+  const sx = d.source.x, sy = d.source.y;
+  const tx = d.target.x, ty = d.target.y;
+  const mx = (sx + tx) / 2, my = (sy + ty) / 2;
+  const dx = tx - sx, dy = ty - sy;
+  const len = Math.hypot(dx, dy) || 1;
+  const bend = len * 0.18;
+  const cx = mx - (dy / len) * bend;
+  const cy = my + (dx / len) * bend;
+  return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
+}
+
+// Nodes
+const R = 4; // radius
+
+const nodeSel = nodeLayer.selectAll('.node-g').data(nodes).enter()
+  .append('g').attr('class','node-g')
+  .call(d3.drag()
+    .on('start', (ev,d)=>{ if(!ev.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on('drag',  (ev,d)=>{ d.fx=ev.x; d.fy=ev.y; })
+    .on('end',   (ev,d)=>{ if(!ev.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
+  )
+  .on('click',     nodeClick)
+  .on('mouseover', nodeOver)
+  .on('mouseout',  nodeOut);
+
+nodeSel.append('circle')
+  .attr('r', R)
+  .attr('fill',   d => CAT[d.cat].light)
+  .attr('stroke', d => CAT[d.cat].color)
+  .attr('stroke-width', 1.8);
+
+// Label group — translate below circle, scale to counter zoom
+const labelGs = nodeSel.append('g').attr('class', 'node-label-g')
+  .attr('transform', `translate(0,${R + 8}) scale(1)`);
+
+labelGs.append('rect')
+  .attr('class','node-label-bg')
+  .attr('fill','#fff')
+  .attr('rx', 8).attr('ry', 8);
+
+labelGs.append('text')
+  .attr('class','node-label')
+  .attr('text-anchor','middle')
+  .attr('dy', 8)
+  .attr('fill', d => CAT[d.cat].color)
+  .text(d => d.name.length > 13 ? d.name.slice(0,11)+'…' : d.name);
+
+// Measure text and size the background rect (once at init)
+nodeSel.each(function() {
+  const grp  = d3.select(this);
+  const bbox = grp.select('.node-label').node().getBBox();
+  const px = 4, py = 2;
+  grp.select('.node-label-bg')
+    .attr('x', bbox.x - px)
+    .attr('y', bbox.y - py)
+    .attr('width',  bbox.width  + px * 2)
+    .attr('height', bbox.height + py * 2);
+});
+
+// Category labels — white pill at top of each ellipse
+const catLabelData = Object.entries(CAT).map(([name, cfg]) => ({ name, cfg }));
+const catLabelGroups = labelLayer.selectAll('.cat-label-g').data(catLabelData).enter()
+  .append('g').attr('class', 'cat-label-g');
+
+catLabelGroups.append('rect').attr('class','cat-label-bg')
+  .attr('rx', 4).attr('ry', 4).attr('fill', '#fff')
+  .attr('fill-opacity', .92);
+
+catLabelGroups.append('text').attr('class','cat-label-text')
+  .attr('text-anchor', 'middle')
+  .attr('fill', d => d.cfg.color)
+  .attr('dy', 0)
+  .text(d => d.name.toUpperCase());
+
+catLabelGroups.append('text').attr('class','cat-label-sub')
+  .attr('text-anchor', 'middle')
+  .attr('fill', d => d.cfg.color)
+  .attr('dy', 10)
+  .attr('font-size', '6px')
+  .attr('font-weight', '500')
+  .attr('letter-spacing', '.04em')
+  .attr('opacity', .75)
+  .text(d => d.cfg.sub);
+
+// Size bg rect to cover both text elements
+catLabelGroups.each(function() {
+  const grp = d3.select(this);
+  const b1 = grp.select('.cat-label-text').node().getBBox();
+  const b2 = grp.select('.cat-label-sub').node().getBBox();
+  const x  = Math.min(b1.x, b2.x);
+  const y  = Math.min(b1.y, b2.y);
+  const w  = Math.max(b1.x + b1.width, b2.x + b2.width) - x;
+  const h  = Math.max(b1.y + b1.height, b2.y + b2.height) - y;
+  const px = 6, py = 3;
+  grp.select('rect')
+    .attr('x', x - px).attr('y', y - py)
+    .attr('width', w + px*2).attr('height', h + py*2);
+});
+
+// ════════════════════════════════════════════════════════
+// HULL — ellipses fitted to each category cluster
+// ════════════════════════════════════════════════════════
+const PAD_X = 50, PAD_Y = 44; // padding around nodes
+
+function drawHulls() {
+  const bycat = {};
+  nodes.forEach(n => { (bycat[n.cat] = bycat[n.cat]||[]).push(n); });
+
+  const ellipseData = Object.entries(bycat).map(([cat, ns]) => {
+    const xs = ns.map(n => n.x), ys = ns.map(n => n.y);
+    const cx = (d3.min(xs) + d3.max(xs)) / 2;
+    const cy = (d3.min(ys) + d3.max(ys)) / 2;
+    const ps = CAT[cat].padScale || 1;
+    const rx = Math.max((d3.max(xs) - d3.min(xs)) / 2 + PAD_X * ps, PAD_X * 1.2 * ps);
+    const ry = Math.max((d3.max(ys) - d3.min(ys)) / 2 + PAD_Y * ps, PAD_Y * 1.2 * ps);
+    return { cat, cx, cy, rx, ry };
+  });
+
+  const ovals = hullLayer.selectAll('.hull-path').data(ellipseData, d => d.cat);
+  ovals.enter().append('ellipse').attr('class','hull-path')
+    .merge(ovals)
+    .attr('cx', d => d.cx)
+    .attr('cy', d => d.cy)
+    .attr('rx', d => d.rx)
+    .attr('ry', d => d.ry)
+    .attr('fill',   d => CAT[d.cat].light)
+    .attr('stroke', d => CAT[d.cat].color);
+  ovals.exit().remove();
+
+  // Position label groups at top-center of each ellipse, counter-scaled for zoom
+  const ellipseMap = {};
+  ellipseData.forEach(e => { ellipseMap[e.cat] = e; });
+  catLabelGroups.attr('transform', d => {
+    const e = ellipseMap[d.name];
+    if (!e) return '';
+    return `translate(${e.cx}, ${e.cy - e.ry + 16})`;
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// TICK
+// ════════════════════════════════════════════════════════
+sim.on('tick', () => {
+  linkSel.attr('d', curvePath);
+
+  nodeSel.attr('transform', d=>`translate(${d.x},${d.y})`);
+
+  drawHulls();
+});
+
+// ════════════════════════════════════════════════════════
+// INTERACTION — selection state
+// ════════════════════════════════════════════════════════
+let selected = null;
+
+function connectedSets(d) {
+  const nodeSet = new Set([d.id]);
+  const linkSet = new Set();
+  links.forEach((l,i) => {
+    const s = l.source.id, t = l.target.id;
+    if (s===d.id||t===d.id){ nodeSet.add(s); nodeSet.add(t); linkSet.add(i); }
+  });
+  return { nodeSet, linkSet };
+}
+
+function applyHighlight(d) {
+  const {nodeSet, linkSet} = connectedSets(d);
+
+  nodeSel.select('circle')
+    .attr('opacity', n => nodeSet.has(n.id) ? 1 : .12)
+    .attr('stroke-width', n => n.id===d.id ? 3 : 1.8)
+    .attr('filter', n => n.id===d.id ? 'url(#glow)' : null);
+
+  nodeSel.select('.node-label-g')
+    .attr('opacity', n => nodeSet.has(n.id) ? 1 : .12);
+
+  linkSel
+    .attr('opacity', (_,i) => linkSet.has(i) ? .8 : .06)
+    .attr('stroke',  (l,i) => linkSet.has(i) ? CAT[l.source.cat||nodes[l.source.id]?.cat].color : '#ccc')
+    .attr('stroke-width', (_,i) => linkSet.has(i) ? 1.8 : 1);
+
+  hullLayer.selectAll('.hull-path').attr('opacity', h => nodeSet.has(nodes.find(n=>n.cat===h.cat)?.id) ? .9 : .25);
+}
+
+function clearHighlight() {
+  nodeSel.select('circle').attr('opacity',1).attr('stroke-width',1.8).attr('filter',null);
+  nodeSel.select('.node-label-g').attr('opacity',1);
+  linkSel.attr('opacity',.55).attr('stroke','#ccc').attr('stroke-width',1);
+  hullLayer.selectAll('.hull-path').attr('opacity',1);
+}
+
+function nodeClick(ev, d) {
+  ev.stopPropagation();
+  if (selected?.id === d.id) { selected=null; clearHighlight(); showEmpty(); return; }
+  selected = d;
+  applyHighlight(d);
+  showInfo(d);
+}
+
+svg.on('click', () => { selected=null; clearHighlight(); showEmpty(); });
+
+// ════════════════════════════════════════════════════════
+// INFO PANEL
+// ════════════════════════════════════════════════════════
+function showEmpty() {
+  document.getElementById('info-panel').innerHTML = `
+    <div class="info-empty">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+        <circle cx="12" cy="12" r="9"/><path d="M12 8v4m0 4h.01"/>
+      </svg><br>Select a component<br>to see its connections
+    </div>`;
+}
+
+function chipHtml(name) {
+  const ni = nameMap[name];
+  if (ni===undefined) return '';
+  const cat = nodes[ni].cat;
+  const col = CAT[cat].color;
+  const bg  = CAT[cat].light;
+  return `<span class="info-chip" style="background:${bg};border-color:${col}20;color:${col}"
+    onclick="selectByName('${name.replace(/'/,"\\'")}')">
+    <span class="info-chip-dot" style="background:${col}"></span>${name}
+  </span>`;
+}
+
+function showInfo(d) {
+  const col  = CAT[d.cat].color;
+  const usedBy = nodes.filter(n => n.deps.includes(d.name));
+
+  let html = `
+    <div class="info-name">${d.name}</div>
+    <span class="info-badge" style="background:${col}">${d.cat}</span>`;
+
+  if (d.deps.length) {
+    html += `<div class="info-section">Depends on · ${d.deps.length}</div><div>`;
+    d.deps.forEach(dep => { html += chipHtml(dep); });
+    html += `</div>`;
+  }
+  if (usedBy.length) {
+    html += `<div class="info-section">Used by · ${usedBy.length}</div><div>`;
+    usedBy.forEach(n => { html += chipHtml(n.name); });
+    html += `</div>`;
+  }
+  if (!d.deps.length && !usedBy.length) {
+    html += `<p style="font-size:12px;color:#bbb;margin-top:8px">No connections</p>`;
+  }
+
+  document.getElementById('info-panel').innerHTML = html;
+}
+
+window.selectByName = function(name) {
+  const i = nameMap[name];
+  if (i===undefined) return;
+  const d = nodes[i];
+  selected = d;
+  applyHighlight(d);
+  showInfo(d);
+  // pan to node
+  const t = d3.zoomTransform(svg.node());
+  svg.transition().duration(450).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(W/2, H/2).scale(t.k).translate(-d.x, -d.y)
+  );
+};
+
+// ════════════════════════════════════════════════════════
+// TOOLTIP
+// ════════════════════════════════════════════════════════
+const tip = document.getElementById('tip');
+
+function nodeOver(ev, d) {
+  const usedBy = nodes.filter(n=>n.deps.includes(d.name)).length;
+  tip.innerHTML = `<strong>${d.name}</strong><br><span style="opacity:.7">${d.cat}</span><br>
+    ${d.deps.length} dependencies · used by ${usedBy}`;
+  tip.style.opacity = '1';
+  // Position below the node label using SVG world → screen coords
+  const svgRect = document.getElementById('svg').getBoundingClientRect();
+  const t = d3.zoomTransform(svg.node());
+  const sx = svgRect.left + t.applyX(d.x);
+  const sy = svgRect.top  + t.applyY(d.y);
+  const labelBottom = (R + 20) * t.k; // node bottom + label height in screen px
+  tip.style.left = (sx - tip.offsetWidth / 2) + 'px';
+  tip.style.top  = (sy + labelBottom + 6) + 'px';
+}
+function nodeOut() { tip.style.opacity='0'; }
+
+// ════════════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════════════
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  if (!q) { if (!selected) clearHighlight(); return; }
+
+  const matched = new Set(nodes.filter(n=>n.name.toLowerCase().includes(q)).map(n=>n.id));
+
+  nodeSel.select('circle').attr('opacity', n => matched.has(n.id) ? 1 : .1);
+  nodeSel.select('.node-label-g').attr('opacity', n => matched.has(n.id) ? 1 : .1);
+  linkSel.attr('opacity', .05);
+  hullLayer.selectAll('.hull-path').attr('opacity', .15);
+});
+
+// ════════════════════════════════════════════════════════
+// LEGEND
+// ════════════════════════════════════════════════════════
+const legendEl = document.getElementById('legend');
+legendEl.innerHTML = '<div class="legend-heading">Categories</div>';
+let activeCatFilter = null;
+
+Object.entries(CAT).forEach(([cat, cfg]) => {
+  const count = nodes.filter(n=>n.cat===cat).length;
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.dataset.cat = cat;
+  item.style.background = cfg.light;
+  item.style.borderColor = cfg.color + '40';
+  item.innerHTML = `
+    <div class="legend-dot" style="background:${cfg.color}"></div>
+    <span class="legend-label" style="color:${cfg.color}">${cat}</span>
+    <span class="legend-count" style="color:${cfg.color}">${count}</span>`;
+  item.addEventListener('click', () => {
+    if (activeCatFilter === cat) {
+      activeCatFilter = null;
+      item.classList.remove('active');
+      if (!selected) clearHighlight();
+    } else {
+      document.querySelectorAll('.legend-item').forEach(el=>el.classList.remove('active'));
+      item.classList.add('active');
+      activeCatFilter = cat;
+      const catIds = new Set(nodes.filter(n=>n.cat===cat).map(n=>n.id));
+      nodeSel.select('circle').attr('opacity', n => catIds.has(n.id) ? 1 : .1);
+      nodeSel.select('.node-label-g').attr('opacity', n => catIds.has(n.id) ? 1 : .1);
+      linkSel.attr('opacity', (l) => catIds.has(l.source.id||l.source) ? .4 : .04);
+      hullLayer.selectAll('.hull-path').attr('opacity', h => h.cat===cat ? 1 : .12);
+    }
+  });
+  legendEl.appendChild(item);
+});
+
+// ════════════════════════════════════════════════════════
+// ZOOM CONTROLS
+// ════════════════════════════════════════════════════════
+document.getElementById('btn-in') .addEventListener('click', ()=>svg.transition().duration(280).call(zoom.scaleBy, 1.35));
+document.getElementById('btn-out').addEventListener('click', ()=>svg.transition().duration(280).call(zoom.scaleBy, 1/1.35));
+document.getElementById('btn-fit').addEventListener('click', fitView);
+
+function fitView() {
+  svg.transition().duration(500).call(
+    zoom.transform,
+    d3.zoomIdentity.translate(W*.05, H*.05).scale(.9)
+  );
+}
+
+// Bottom legend
+const blEl = document.getElementById('bottom-legend');
+Object.entries(CAT).forEach(([cat, cfg]) => {
+  const item = document.createElement('div');
+  item.className = 'bl-item';
+  item.innerHTML = `<div class="bl-dot" style="background:${cfg.color}"></div>
+    <span class="bl-label" style="color:${cfg.color}">${cat}</span>`;
+  blEl.appendChild(item);
+});
+
+// Initial fit after simulation settles
+setTimeout(fitView, 2200);
+
+// Resize
+window.addEventListener('resize', () => {
+  W = container.clientWidth; H = container.clientHeight;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+  sim.force('x', d3.forceX(n=>CAT[n.cat].cx*W).strength(.12))
+     .force('y', d3.forceY(n=>CAT[n.cat].cy*H).strength(.12))
+     .alpha(.3).restart();
+});
+</script>
+</body>
+</html>
