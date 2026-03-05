@@ -932,14 +932,13 @@ function nodeOver(ev, d) {
   tip.innerHTML = `<strong>${d.name}</strong><br><span style="opacity:.7">${d.cat}</span><br>
     ${d.deps.length} dependencies · used by ${usedBy}`;
   tip.style.opacity = '1';
-  // Position below the node label using SVG world → screen coords
+  // Position above the node using SVG world → screen coords
   const svgRect = document.getElementById('svg').getBoundingClientRect();
   const t = d3.zoomTransform(svg.node());
   const sx = svgRect.left + t.applyX(d.x);
   const sy = svgRect.top  + t.applyY(d.y);
-  const labelBottom = (R + 20) * t.k; // node bottom + label height in screen px
   tip.style.left = (sx - tip.offsetWidth / 2) + 'px';
-  tip.style.top  = (sy + labelBottom + 6) + 'px';
+  tip.style.top  = (sy - R * t.k - tip.offsetHeight - 8) + 'px';
 }
 function nodeOut() { tip.style.opacity='0'; }
 
