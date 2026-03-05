@@ -932,13 +932,12 @@ function nodeOver(ev, d) {
   tip.innerHTML = `<strong>${d.name}</strong><br><span style="opacity:.7">${d.cat}</span><br>
     ${d.deps.length} dependencies · used by ${usedBy}`;
   tip.style.opacity = '1';
-  // Position above the node using SVG world → screen coords
-  const svgRect = document.getElementById('svg').getBoundingClientRect();
+  // t.applyX/Y gives coords in SVG element space, which equals graph-wrap local space
   const t = d3.zoomTransform(svg.node());
-  const sx = svgRect.left + t.applyX(d.x);
-  const sy = svgRect.top  + t.applyY(d.y);
-  tip.style.left = (sx - tip.offsetWidth / 2) + 'px';
-  tip.style.top  = (sy - R * t.k - tip.offsetHeight - 8) + 'px';
+  const lx = t.applyX(d.x);
+  const ly = t.applyY(d.y);
+  tip.style.left = (lx - tip.offsetWidth / 2) + 'px';
+  tip.style.top  = (ly - R * t.k - tip.offsetHeight - 8) + 'px';
 }
 function nodeOut() { tip.style.opacity='0'; }
 
