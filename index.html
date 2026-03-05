@@ -231,14 +231,18 @@
 
     .info-reset {
       display: flex; align-items: center; justify-content: center; gap: 6px;
-      width: 100%; margin-top: 16px; padding: 8px;
-      border: 1px solid #e8e8e8; border-radius: 7px;
-      background: #fafafa; color: #888;
-      font-size: 11px; font-weight: 600; cursor: pointer;
-      transition: all .15s;
+      width: 100%; margin-top: 16px; padding: 6px 12px;
+      border: 1px solid #d1d1d1; border-radius: 4px;
+      background: #fff; color: #242424;
+      font-size: 12px; font-weight: 400; cursor: pointer;
+      font-family: inherit;
+      transition: background .1s, border-color .1s;
     }
-    .info-reset:hover { background: #f5f5f5; color: #333; border-color: #ccc; }
-    .info-reset svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .info-reset:hover { background: #f5f5f5; border-color: #c7c7c7; }
+    .info-reset:active { background: #ebebeb; border-color: #bdbdbd; }
+    .info-reset svg { width: 12px; height: 12px; flex-shrink: 0; opacity: .7; }
+
+    #btn-reset svg { width: 9px; height: 9px; }
 
     /* ─── TOOLTIP ────────────────────────────────────────── */
     #tip {
