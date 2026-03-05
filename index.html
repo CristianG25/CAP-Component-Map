@@ -12,9 +12,50 @@
       background: #f5f5f5;
       overflow: hidden;
       color: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    #app { display: flex; width: 100vw; height: 100vh; }
+    /* ─── VIEW BAR ───────────────────────────────────────── */
+    #view-bar {
+      height: 44px;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+      position: relative;
+      z-index: 20;
+      flex-shrink: 0;
+    }
+    #view-bar-title {
+      position: absolute; left: 18px;
+      font-size: 12px; font-weight: 700; color: #888; letter-spacing: .03em;
+    }
+    #view-toggle {
+      display: flex;
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .vt-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 16px; border-radius: 6px;
+      border: none; background: transparent;
+      font-size: 12px; font-weight: 600; color: #777;
+      cursor: pointer; transition: all .15s;
+    }
+    .vt-btn.active {
+      background: #fff; color: #111;
+      box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    }
+    .vt-btn:hover:not(.active) { color: #333; background: rgba(255,255,255,.5); }
+    .vt-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    #app { display: flex; flex: 1; overflow: hidden; }
 
     /* ─── SIDEBAR ────────────────────────────────────────── */
     #sidebar {
@@ -195,12 +236,107 @@
       font-size: 11px; font-weight: 600;
     }
 
+    /* ─── LIST VIEW ──────────────────────────────────────── */
+    #list-view {
+      flex: 1; overflow-y: auto;
+      padding: 24px 28px;
+      background: #f5f5f5;
+      display: none;
+    }
+    #list-view::-webkit-scrollbar { width: 6px; }
+    #list-view::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+    #list-toolbar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    #list-search {
+      padding: 7px 12px; border: 1px solid #e0e0e0; border-radius: 7px;
+      font-size: 12px; outline: none; background: #fff; color: #222;
+      width: 220px; transition: border-color .2s;
+    }
+    #list-search:focus { border-color: #0078d4; }
+    #list-cat-filter {
+      padding: 7px 10px; border: 1px solid #e0e0e0; border-radius: 7px;
+      font-size: 12px; outline: none; background: #fff; color: #444;
+      cursor: pointer;
+    }
+    #list-count {
+      font-size: 11px; color: #aaa; margin-left: auto;
+    }
+
+    #comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,.07);
+      table-layout: fixed;
+    }
+    #comp-table th {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: #999;
+      padding: 11px 16px;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    #comp-table th:nth-child(1) { width: 16%; }
+    #comp-table th:nth-child(2) { width: 18%; }
+    #comp-table th:nth-child(3) { width: 33%; }
+    #comp-table th:nth-child(4) { width: 33%; }
+    #comp-table td {
+      padding: 9px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: top;
+      font-size: 12px;
+    }
+    #comp-table tbody tr:last-child td { border-bottom: none; }
+    #comp-table tbody tr:hover td { background: #fafffe; }
+    .tbl-name { font-weight: 600; color: #111; }
+    .tbl-badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 10px;
+      font-size: 10px; font-weight: 600; color: #fff;
+      white-space: nowrap;
+    }
+    .tbl-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 5px;
+      font-size: 11px; font-weight: 500;
+      margin: 1px 2px 1px 0; cursor: pointer;
+      transition: filter .12s;
+    }
+    .tbl-chip:hover { filter: brightness(.92); }
+
     /* ─── SCROLLBAR ──────────────────────────────────────── */
     #info-panel::-webkit-scrollbar { width: 5px; }
     #info-panel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
   </style>
 </head>
 <body>
+
+<!-- VIEW BAR -->
+<div id="view-bar">
+  <span id="view-bar-title">CAP Design System</span>
+  <div id="view-toggle">
+    <button class="vt-btn active" id="btn-map" onclick="switchView('map')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="5" cy="8" r="2"/><circle cx="11" cy="4" r="2"/><circle cx="11" cy="12" r="2"/>
+        <line x1="7" y1="7.1" x2="9.2" y2="5"/><line x1="7" y1="8.9" x2="9.2" y2="11"/>
+      </svg>
+      Map
+    </button>
+    <button class="vt-btn" id="btn-list" onclick="switchView('list')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2" y="3" width="12" height="2.5" rx="1"/><rect x="2" y="6.75" width="12" height="2.5" rx="1"/><rect x="2" y="10.5" width="12" height="2.5" rx="1"/>
+      </svg>
+      List
+    </button>
+  </div>
+</div>
+
 <div id="app">
 
   <!-- SIDEBAR -->
@@ -244,6 +380,28 @@
     <div id="hint">Click any node to highlight its connections</div>
     <div id="tip"></div>
     <div id="bottom-legend"></div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="list-view">
+    <div id="list-toolbar">
+      <input id="list-search" type="text" placeholder="Search components…" oninput="filterTable()" />
+      <select id="list-cat-filter" onchange="filterTable()">
+        <option value="">All categories</option>
+      </select>
+      <span id="list-count"></span>
+    </div>
+    <table id="comp-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Category</th>
+          <th>Depends On</th>
+          <th>Used By</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
 </div>
@@ -826,6 +984,73 @@ Object.entries(CAT).forEach(([cat, cfg]) => {
 
 // Initial fit after simulation settles
 setTimeout(fitView, 2200);
+
+// ════════════════════════════════════════════════════════
+// VIEW TOGGLE
+// ════════════════════════════════════════════════════════
+let currentView = 'map';
+let tableBuilt = false;
+
+// Populate category filter dropdown
+const catFilterEl = document.getElementById('list-cat-filter');
+Object.keys(CAT).forEach(cat => {
+  const opt = document.createElement('option');
+  opt.value = cat; opt.textContent = cat;
+  catFilterEl.appendChild(opt);
+});
+
+window.switchView = function(view) {
+  currentView = view;
+  document.getElementById('graph-wrap').style.display = view === 'map' ? '' : 'none';
+  document.getElementById('list-view').style.display  = view === 'list' ? 'flex' : 'none';
+  document.getElementById('list-view').style.flexDirection = 'column';
+  document.getElementById('btn-map').classList.toggle('active',  view === 'map');
+  document.getElementById('btn-list').classList.toggle('active', view === 'list');
+  if (view === 'list') {
+    if (!tableBuilt) buildTable();
+    filterTable();
+  }
+};
+
+function chipHtmlTable(name) {
+  const ni = nameMap[name];
+  if (ni === undefined) return `<span class="tbl-chip" style="background:#f0f0f0;color:#888">${name}</span>`;
+  const dc = CAT[nodes[ni].cat];
+  return `<span class="tbl-chip" style="background:${dc.light};color:${dc.color}"
+    onclick="switchView('map');selectByName('${name.replace(/'/g, "\\'")}')">${name}</span>`;
+}
+
+function buildTable() {
+  tableBuilt = true;
+  const tbody = document.querySelector('#comp-table tbody');
+  const sorted = [...nodes].sort((a,b) => a.cat.localeCompare(b.cat) || a.name.localeCompare(b.name));
+
+  sorted.forEach(d => {
+    const col = CAT[d.cat].color;
+    const usedBy = nodes.filter(n => n.deps.includes(d.name));
+    const tr = document.createElement('tr');
+    tr.dataset.name = d.name.toLowerCase();
+    tr.dataset.cat  = d.cat;
+    tr.innerHTML = `
+      <td class="tbl-name">${d.name}</td>
+      <td><span class="tbl-badge" style="background:${col}">${d.cat}</span></td>
+      <td>${d.deps.map(chipHtmlTable).join('') || '<span style="color:#ccc">—</span>'}</td>
+      <td>${usedBy.map(n => chipHtmlTable(n.name)).join('') || '<span style="color:#ccc">—</span>'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+window.filterTable = function() {
+  const q   = document.getElementById('list-search').value.trim().toLowerCase();
+  const cat = document.getElementById('list-cat-filter').value;
+  let visible = 0;
+  document.querySelectorAll('#comp-table tbody tr').forEach(tr => {
+    const show = (!q || tr.dataset.name.includes(q)) && (!cat || tr.dataset.cat === cat);
+    tr.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('list-count').textContent = `${visible} component${visible !== 1 ? 's' : ''}`;
+};
 
 // Resize
 window.addEventListener('resize', () => {
