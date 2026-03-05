@@ -285,7 +285,8 @@
       white-space: nowrap;
     }
     #comp-table th:hover { background: #f0f0f0; color: #666; }
-    #comp-table th .sort-icon { margin-left: 5px; opacity: .3; font-style: normal; }
+    #comp-table th .sort-wrap { display: inline-flex; vertical-align: middle; margin-left: 5px; }
+    #comp-table th .sort-icon { width: 11px; height: 11px; opacity: .3; flex-shrink: 0; }
     #comp-table th.sort-asc  .sort-icon { opacity: 1; color: #0078d4; }
     #comp-table th.sort-desc .sort-icon { opacity: 1; color: #0078d4; }
     #comp-table th:nth-child(1) { width: 16%; }
@@ -400,10 +401,10 @@
     <table id="comp-table">
       <thead>
         <tr>
-          <th data-col="name">Component <i class="sort-icon">↕</i></th>
-          <th data-col="cat">Category <i class="sort-icon">↕</i></th>
-          <th data-col="deps">Depends On <i class="sort-icon">↕</i></th>
-          <th data-col="usedby">Used By <i class="sort-icon">↕</i></th>
+          <th data-col="name">Component <span class="sort-wrap"></span></th>
+          <th data-col="cat">Category <span class="sort-wrap"></span></th>
+          <th data-col="deps">Depends On <span class="sort-wrap"></span></th>
+          <th data-col="usedby">Used By <span class="sort-wrap"></span></th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -1048,7 +1049,15 @@ function buildTable() {
   });
 }
 
-// Column sort
+// Column sort — Fluent chevron icons
+const SVG_ATTRS = `viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"`;
+const CHEVRON_NEUTRAL = `<svg class="sort-icon" ${SVG_ATTRS}><path d="M4 6.5 L8 3.5 L12 6.5"/><path d="M4 9.5 L8 12.5 L12 9.5"/></svg>`;
+const CHEVRON_UP      = `<svg class="sort-icon" ${SVG_ATTRS}><path d="M4 10 L8 6 L12 10"/></svg>`;
+const CHEVRON_DOWN    = `<svg class="sort-icon" ${SVG_ATTRS}><path d="M4 6 L8 10 L12 6"/></svg>`;
+
+// Init all headers with neutral icon
+document.querySelectorAll('#comp-table th .sort-wrap').forEach(w => { w.innerHTML = CHEVRON_NEUTRAL; });
+
 let sortCol = null, sortDir = 1;
 
 document.querySelectorAll('#comp-table th[data-col]').forEach(th => {
@@ -1056,9 +1065,13 @@ document.querySelectorAll('#comp-table th[data-col]').forEach(th => {
     const col = th.dataset.col;
     if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = 1; }
 
-    document.querySelectorAll('#comp-table th').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+    document.querySelectorAll('#comp-table th').forEach(h => {
+      h.classList.remove('sort-asc', 'sort-desc');
+      const w = h.querySelector('.sort-wrap');
+      if (w) w.innerHTML = CHEVRON_NEUTRAL;
+    });
     th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
-    th.querySelector('.sort-icon').textContent = sortDir === 1 ? '↑' : '↓';
+    th.querySelector('.sort-wrap').innerHTML = sortDir === 1 ? CHEVRON_UP : CHEVRON_DOWN;
 
     const tbody = document.querySelector('#comp-table tbody');
     const numeric = col === 'deps' || col === 'usedby';
