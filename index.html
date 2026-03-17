@@ -1120,7 +1120,7 @@ function fitView() {
   const k = Math.min((cw - pad*2) / (x1-x0), (ch - pad*2) / (y1-y0), 2);
   const tx = (cw - k*(x0+x1)) / 2;
   const ty = (ch - k*(y0+y1)) / 2;
-  svg.transition().duration(500).call(
+  svg.transition().duration(200).call(
     zoom.transform,
     d3.zoomIdentity.translate(tx, ty).scale(k)
   );
