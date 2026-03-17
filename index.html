@@ -1101,9 +1101,28 @@ document.getElementById('btn-out').addEventListener('click', ()=>svg.transition(
 document.getElementById('btn-fit').addEventListener('click', fitView);
 
 function fitView() {
+  const pad = 40;
+  const ellipses = hullLayer.selectAll('.hull-path').nodes();
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  ellipses.forEach(el => {
+    const cx = +el.getAttribute('cx'), cy = +el.getAttribute('cy');
+    const rx = +el.getAttribute('rx'), ry = +el.getAttribute('ry');
+    x0 = Math.min(x0, cx - rx); x1 = Math.max(x1, cx + rx);
+    y0 = Math.min(y0, cy - ry); y1 = Math.max(y1, cy + ry);
+  });
+  // fallback to node positions if hulls not yet drawn
+  if (!isFinite(x0)) {
+    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+    x0 = Math.min(...xs); x1 = Math.max(...xs);
+    y0 = Math.min(...ys); y1 = Math.max(...ys);
+  }
+  const cw = container.clientWidth, ch = container.clientHeight;
+  const k = Math.min((cw - pad*2) / (x1-x0), (ch - pad*2) / (y1-y0), 2);
+  const tx = (cw - k*(x0+x1)) / 2;
+  const ty = (ch - k*(y0+y1)) / 2;
   svg.transition().duration(500).call(
     zoom.transform,
-    d3.zoomIdentity.translate(W*.05, H*.05).scale(.9)
+    d3.zoomIdentity.translate(tx, ty).scale(k)
   );
 }
 
