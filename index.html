@@ -1137,7 +1137,7 @@ Object.entries(CAT).forEach(([cat, cfg]) => {
 });
 
 // Initial fit after simulation settles
-setTimeout(fitView, 2200);
+sim.on('end', fitView);
 
 // ════════════════════════════════════════════════════════
 // VIEW TOGGLE
