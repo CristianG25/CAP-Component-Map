@@ -242,7 +242,7 @@
     .info-reset:active { background: #ebebeb; border-color: #bdbdbd; }
     .info-reset svg { width: 12px; height: 12px; flex-shrink: 0; opacity: .7; }
 
-    #btn-reset svg { width: 9px; height: 9px; }
+    #btn-reset svg { width: 12px; height: 12px; }
 
     /* ─── TOOLTIP ────────────────────────────────────────── */
     #tip {
@@ -419,10 +419,6 @@
           markerWidth="5" markerHeight="5" orient="auto">
           <path d="M0,0 L8,4 L0,8 Z" fill="#c8c8c8"/>
         </marker>
-        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
       </defs>
     </svg>
     <div id="controls">
@@ -560,7 +556,7 @@ const RAW = [
   { name:"Drawer",            cat:"Navigation & Feedback",   deps:["Dialog","Toolbar","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
   { name:"MessageBar",        cat:"Navigation & Feedback",   deps:["Button","Link","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
   { name:"Nav",               cat:"Navigation & Feedback",   deps:["Button","Divider","Drawer","Tooltip","MenuButton","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"ProgressBar",       cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography"] },
+  { name:"ProgressBar",       cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography","Fluent Styles"] },
   { name:"Skeleton",          cat:"Navigation & Feedback",   deps:["Fluent Colors"] },
   { name:"Slider",            cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography"] },
   { name:"StatusIndicator",   cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography","Fluent Iconography"] },
@@ -849,10 +845,15 @@ function applyHighlight(d) {
   nodeSel.select('circle')
     .attr('opacity', n => nodeSet.has(n.id) ? 1 : .12)
     .attr('stroke-width', n => n.id===d.id ? 3 : 1.8)
-    .attr('filter', n => n.id===d.id ? 'url(#glow)' : null);
+    .style('filter', n => n.id===d.id ? 'drop-shadow(0 2px 6px rgba(0,0,0,.35))' : null);
 
   nodeSel.select('.node-label-g')
     .attr('opacity', n => nodeSet.has(n.id) ? 1 : .12);
+
+  nodeSel.select('.node-label-bg')
+    .attr('fill', n => n.id === d.id ? CAT[n.cat].color : '#fff');
+  nodeSel.select('.node-label')
+    .attr('fill', n => n.id === d.id ? '#fff' : CAT[n.cat].color);
 
   linkSel
     .attr('opacity', (_,i) => linkSet.has(i) ? .8 : .06)
@@ -863,8 +864,10 @@ function applyHighlight(d) {
 }
 
 function clearHighlight() {
-  nodeSel.select('circle').attr('opacity',1).attr('stroke-width',1.8).attr('filter',null);
+  nodeSel.select('circle').attr('opacity',1).attr('stroke-width',1.8).style('filter',null);
   nodeSel.select('.node-label-g').attr('opacity',1);
+  nodeSel.select('.node-label-bg').attr('fill','#fff');
+  nodeSel.select('.node-label').attr('fill', n => CAT[n.cat].color);
   linkSel.attr('opacity',.55).attr('stroke','#ccc').attr('stroke-width',1);
   hullLayer.selectAll('.hull-path').attr('opacity',1);
 }
