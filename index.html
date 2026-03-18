@@ -114,14 +114,23 @@
     .sd-name { font-size: 12px; font-weight: 600; color: #111; flex: 1; }
     .sd-cat  { font-size: 10px; font-weight: 500; color: #aaa; white-space: nowrap; }
     .sd-empty { padding: 12px 14px; font-size: 12px; color: #bbb; }
+    .sb-search-wrap { position: relative; }
     .sb-search input {
-      width: 100%; padding: 7px 10px;
-      border: 1px solid #e0e0e0; border-radius: 6px;
-      font-size: 12px; outline: none; color: #222;
-      transition: border-color .2s;
-      background: #fafafa;
+      width: 100%; height: 36px; padding: 10px 36px 10px 12px;
+      border: 1px solid #f5f5f5; border-radius: 12px;
+      font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 400;
+      line-height: 20px; outline: none; color: #616161;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: border-color .2s, box-shadow .2s;
+      background: #fff; box-sizing: border-box;
     }
-    .sb-search input:focus { border-color: #0078d4; background: #fff; }
+    .sb-search input:hover { border-color: #575757; }
+    .sb-search input:focus { border-color: #0078d4; }
+    .sb-search input:focus + .sb-search-icon { color: #0078d4; }
+    .sb-search-icon {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #616161;
+    }
 
     #legend {
       padding: 10px 14px;
@@ -312,17 +321,51 @@
       display: flex; align-items: center; gap: 12px;
       margin-bottom: 16px;
     }
+    .list-search-wrap { position: relative; }
     #list-search {
-      padding: 7px 12px; border: 1px solid #e0e0e0; border-radius: 7px;
-      font-size: 12px; outline: none; background: #fff; color: #222;
-      width: 220px; transition: border-color .2s;
+      height: 36px; padding: 10px 36px 10px 12px;
+      border: 1px solid #616161; border-radius: 12px;
+      font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px;
+      font-weight: 400; line-height: 20px;
+      outline: none; background: #fff; color: #616161;
+      width: 220px; transition: border-color .2s; box-sizing: border-box;
     }
+    #list-search:hover { border-color: #575757; }
     #list-search:focus { border-color: #0078d4; }
-    #list-cat-filter {
-      padding: 7px 10px; border: 1px solid #e0e0e0; border-radius: 7px;
-      font-size: 12px; outline: none; background: #fff; color: #444;
-      cursor: pointer;
+    #list-search:focus + .list-search-icon { color: #0078d4; }
+    .list-search-icon {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #616161;
     }
+    #list-cat-filter-wrap { position: relative; width: 220px; }
+    #list-cat-trigger {
+      height: 36px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+      border: 1px solid #616161; border-radius: 12px;
+      font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px;
+      font-weight: 400; line-height: 20px; color: #616161;
+      background: #fff; cursor: pointer; white-space: nowrap;
+      transition: border-color .2s;
+    }
+    #list-cat-trigger:hover { border-color: #575757; }
+    #list-cat-trigger.open { border-color: #0078d4; border-radius: 12px 12px 0 0; }
+    #list-cat-trigger svg { flex-shrink: 0; transition: transform .15s; }
+    #list-cat-trigger.open svg { transform: rotate(180deg); }
+    #list-cat-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: #fff; border: 1px solid #0078d4; border-top: none;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+    #list-cat-dropdown.open { display: block; }
+    .cat-option {
+      padding: 8px 12px; font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px; color: #616161; cursor: pointer;
+      transition: background .1s;
+    }
+    .cat-option:hover { background: #f0f7ff; }
+    .cat-option.selected { color: #0078d4; font-weight: 600; }
     #list-count {
       font-size: 12px; font-weight: 700; color: #111; margin-left: auto;
     }
@@ -351,10 +394,11 @@
     #comp-table th .sort-icon { width: 11px; height: 11px; opacity: .3; flex-shrink: 0; }
     #comp-table th.sort-asc  .sort-icon { opacity: 1; color: #0078d4; }
     #comp-table th.sort-desc .sort-icon { opacity: 1; color: #0078d4; }
-    #comp-table th:nth-child(1) { width: 16%; }
-    #comp-table th:nth-child(2) { width: 18%; }
-    #comp-table th:nth-child(3) { width: 33%; }
+    #comp-table th:nth-child(1) { width: 2%; }
+    #comp-table th:nth-child(2) { width: 10%; }
+    #comp-table th:nth-child(3) { width: 10%; }
     #comp-table th:nth-child(4) { width: 33%; }
+    #comp-table th:nth-child(5) { width: 33%; }
     #comp-table td {
       padding: 9px 16px;
       border-bottom: 1px solid #f0f0f0;
@@ -363,6 +407,11 @@
     }
     #comp-table tbody tr:last-child td { border-bottom: none; }
     #comp-table tbody tr:hover td { background: #fafffe; }
+    #comp-table tbody { counter-reset: row-num; }
+    #comp-table tbody tr:not([style*="display: none"]) { counter-increment: row-num; }
+    .tbl-num { color: #bbb; font-size: 11px; width: 10px; text-align: center; }
+    .tbl-num::before { content: counter(row-num); }
+    .tbl-num-col { width: 10px; text-align: center; color: #bbb; }
     .tbl-name { font-weight: 600; color: #111; }
     .tbl-badge {
       display: inline-flex; align-items: center;
@@ -482,7 +531,7 @@
     }
     .cfg-lane-body {
       display: flex; flex-wrap: wrap; gap: 5px;
-      padding: 10px 14px; min-height: 48px; transition: background .1s;
+      padding: 10px 14px 24px; min-height: 48px; transition: background .1s;
     }
     .cfg-lane-body.drag-over {
       background: #f0f7ff;
@@ -535,8 +584,14 @@
       <p>Click a node to explore connections</p>
     </div>
     <div class="sb-search">
-      <input id="search" type="text" placeholder="Search components…" autocomplete="off" />
-      <div id="search-dropdown"></div>
+      <div class="sb-search-wrap">
+        <input id="search" type="text" placeholder="Search components…" autocomplete="off" />
+        <svg class="sb-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="6.5" cy="6.5" r="4"/>
+          <line x1="10" y1="10" x2="14" y2="14"/>
+        </svg>
+        <div id="search-dropdown"></div>
+      </div>
     </div>
     <div id="legend"></div>
     <div id="info-panel">
@@ -595,15 +650,28 @@
   <!-- LIST VIEW -->
   <div id="list-view">
     <div id="list-toolbar">
-      <input id="list-search" type="text" placeholder="Search components…" oninput="filterTable()" />
-      <select id="list-cat-filter" onchange="filterTable()">
-        <option value="">All categories</option>
-      </select>
+      <div class="list-search-wrap">
+        <input id="list-search" type="text" placeholder="Search components…" oninput="filterTable()" />
+        <svg class="list-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="6.5" cy="6.5" r="4"/>
+          <line x1="10" y1="10" x2="14" y2="14"/>
+        </svg>
+      </div>
+      <div id="list-cat-filter-wrap">
+        <button id="list-cat-trigger" type="button">
+          <span id="list-cat-label">All categories</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6 L8 10 L12 6"/>
+          </svg>
+        </button>
+        <div id="list-cat-dropdown"></div>
+      </div>
       <span id="list-count"></span>
     </div>
     <table id="comp-table">
       <thead>
         <tr>
+          <th class="tbl-num-col">#</th>
           <th data-col="name">Component <span class="sort-wrap"></span></th>
           <th data-col="cat">Category <span class="sort-wrap"></span></th>
           <th data-col="deps">Depends On <span class="sort-wrap"></span></th>
@@ -635,7 +703,7 @@ const CAT = {
     cx: .50, cy: .08, padScale: 0.9, xyStrength: 0.90, clusterStrength: 0.70, sub: "Shell Layer"
   },
   "Navigation & Feedback": {
-    color: "#b5336e", light: "#fce4ef",
+    color: "#7B2FBE", light: "#f0e6f8",
     cx: .90, cy: .50, sub: "Wayfinding Layer"
   },
   "Data & Expression": {
@@ -649,85 +717,89 @@ const CAT = {
 // ════════════════════════════════════════════════════════
 const RAW = [
   // ── Foundations ──────────────────────────────────────
-  { name:"Grid System",       cat:"Foundations",             deps:[] },
-  { name:"Appearance",        cat:"Foundations",             deps:["Grid System"] },
-  { name:"Fluent Iconography",cat:"Foundations",             deps:[] },
-  { name:"Fluent Avatars",    cat:"Foundations",             deps:[] },
-  { name:"Fluent Typography", cat:"Foundations",             deps:[] },
-  { name:"Fluent Colors",     cat:"Foundations",             deps:[] },
-  { name:"Fluent Styles",     cat:"Foundations",             deps:["Grid System"] },
-  { name:"Avatar",            cat:"Foundations",             deps:["Fluent Avatars","Fluent Iconography","Fluent Typography","Popover"] },
-  { name:"AvatarGroup",       cat:"Foundations",             deps:["Avatar","Tooltip"] },
-  { name:"Badge",             cat:"Foundations",             deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Appearance"] },
-  { name:"Image",             cat:"Foundations",             deps:["Fluent Avatars"] },
-  { name:"Label",             cat:"Foundations",             deps:["Badge","Fluent Colors","Fluent Typography","Fluent Iconography"] },
-  { name:"Link",              cat:"Foundations",             deps:["Fluent Colors","Fluent Typography"] },
+  { name:"Grid System",         cat:"Foundations",             deps:[] },
+  { name:"Appearance",          cat:"Foundations",             deps:["Grid System"] },
+  { name:"Fluent Iconography",  cat:"Foundations",             deps:[] },
+  { name:"Fluent Avatars",      cat:"Foundations",             deps:[] },
+  { name:"Fluent Typography",   cat:"Foundations",             deps:[] },
+  { name:"Fluent Shared Colors",cat:"Foundations",             deps:[] },
+  { name:"Fluent Brand Colors", cat:"Foundations",             deps:[] },
+  { name:"Fluent Elevation",    cat:"Foundations",             deps:["Grid System"] },
+  { name:"Fluent Layout",       cat:"Foundations",             deps:[] },
+  { name:"Fluent Material",     cat:"Foundations",             deps:[] },
+  { name:"Fluent Shapes",       cat:"Foundations",             deps:[] },
+  { name:"Avatar",              cat:"Foundations",             deps:["Fluent Avatars","Fluent Iconography","Fluent Typography","Popover"] },
+  { name:"AvatarGroup",         cat:"Foundations",             deps:["Avatar","Tooltip"] },
+  { name:"Badge",               cat:"Foundations",             deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"Image",               cat:"Foundations",             deps:["Fluent Avatars"] },
+  { name:"Label",               cat:"Foundations",             deps:["Badge","Fluent Brand Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Link",                cat:"Foundations",             deps:["Fluent Brand Colors","Fluent Typography"] },
 
   // ── Input & Controls ─────────────────────────────────
-  { name:"Accordion",         cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Typography","Fluent Colors"] },
-  { name:"Breadcrumb",        cat:"Input & Controls",        deps:["Fluent Colors","Fluent Iconography","Fluent Typography","Button","Link"] },
-  { name:"Button",            cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Appearance","Fluent Styles"] },
-  { name:"Checkbox",          cat:"Input & Controls",        deps:["Field","Label","Fluent Colors","Fluent Iconography"] },
-  { name:"ComboBox",          cat:"Input & Controls",        deps:["Field","Fluent Typography","Fluent Colors","Appearance","Fluent Styles"] },
-  { name:"CompoundButton",    cat:"Input & Controls",        deps:["Button","Fluent Typography","Fluent Colors","Fluent Iconography","Appearance","Fluent Styles"] },
-  { name:"CounterBadge",      cat:"Input & Controls",        deps:["Badge","Fluent Typography","Fluent Colors","Appearance","Fluent Styles"] },
-  { name:"Dialog",            cat:"Input & Controls",        deps:["Button","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Dropdown",          cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Field",             cat:"Input & Controls",        deps:["Label","Input","InfoLabel","StatusIndicator","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Filter",            cat:"Input & Controls",        deps:["Tag","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"FloatingActionButton",cat:"Input & Controls",      deps:["Button","Popover","Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"InfoLabel",         cat:"Input & Controls",        deps:["Label","Popover","Fluent Colors","Fluent Typography","Fluent Iconography"] },
-  { name:"Input",             cat:"Input & Controls",        deps:["Field","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"List",              cat:"Input & Controls",        deps:["Checkbox","Button","Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Menu",              cat:"Input & Controls",        deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"MenuButton",        cat:"Input & Controls",        deps:["Menu","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Persona",           cat:"Input & Controls",        deps:["Avatar","Badge","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance","Fluent Avatars"] },
-  { name:"Popover",           cat:"Input & Controls",        deps:["Link","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"RadioGroup",        cat:"Input & Controls",        deps:["Field","Label","Fluent Colors","Fluent Typography"] },
-  { name:"SearchBox",         cat:"Input & Controls",        deps:["Input","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"SplitButton",       cat:"Input & Controls",        deps:["Button","Fluent Colors","Fluent Typography","Fluent Styles","Appearance"] },
-  { name:"SplitDropdown",     cat:"Input & Controls",        deps:["Dropdown","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Switch",            cat:"Input & Controls",        deps:["Field","Label","Fluent Avatars","Fluent Colors","Fluent Typography"] },
-  { name:"TabList",           cat:"Input & Controls",        deps:["MenuButton","Fluent Iconography","Fluent Colors","Fluent Typography"] },
-  { name:"Tag",               cat:"Input & Controls",        deps:["Avatar","Fluent Iconography","Fluent Colors","Fluent Typography"] },
-  { name:"TagGroup",          cat:"Input & Controls",        deps:["Tag","Fluent Iconography","Fluent Colors","Fluent Typography"] },
-  { name:"TeachingPopover",   cat:"Input & Controls",        deps:["Popover","Button","Fluent Typography","Fluent Colors","Fluent Styles","Appearance"] },
-  { name:"TextArea",          cat:"Input & Controls",        deps:["Field","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles"] },
-  { name:"Toast",             cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
-  { name:"ToggleButton",      cat:"Input & Controls",        deps:["Button","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"Accordion",           cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Typography","Fluent Brand Colors"] },
+  { name:"Breadcrumb",          cat:"Input & Controls",        deps:["Fluent Brand Colors","Fluent Iconography","Fluent Typography","Button","Link"] },
+  { name:"Button",              cat:"Input & Controls",        deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance","Fluent Elevation","Fluent Shapes"] },
+  { name:"Checkbox",            cat:"Input & Controls",        deps:["Field","Label","Fluent Brand Colors","Fluent Iconography"] },
+  { name:"ComboBox",            cat:"Input & Controls",        deps:["Field","Fluent Typography","Fluent Brand Colors","Appearance","Fluent Elevation"] },
+  { name:"CompoundButton",      cat:"Input & Controls",        deps:["Button","Fluent Typography","Fluent Brand Colors","Fluent Iconography","Appearance"] },
+  { name:"CounterBadge",        cat:"Input & Controls",        deps:["Badge","Fluent Typography","Fluent Brand Colors","Appearance"] },
+  { name:"Dialog",              cat:"Input & Controls",        deps:["Button","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Layout"] },
+  { name:"Dropdown",            cat:"Input & Controls",        deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"Field",               cat:"Input & Controls",        deps:["Label","Input","InfoLabel","StatusIndicator","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shared Colors","Fluent Shapes"] },
+  { name:"Filter",              cat:"Input & Controls",        deps:["Tag","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"FloatingActionButton",cat:"Input & Controls",        deps:["Button","Popover","Menu","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"InfoLabel",           cat:"Input & Controls",        deps:["Label","Popover","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Shared Colors"] },
+  { name:"Input",               cat:"Input & Controls",        deps:["Field","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"List",                cat:"Input & Controls",        deps:["Checkbox","Button","Menu","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"Menu",                cat:"Input & Controls",        deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"MenuButton",          cat:"Input & Controls",        deps:["Menu","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance"] },
+  { name:"Persona",             cat:"Input & Controls",        deps:["Avatar","Badge","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance","Fluent Avatars"] },
+  { name:"Popover",             cat:"Input & Controls",        deps:["Link","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance"] },
+  { name:"RadioGroup",          cat:"Input & Controls",        deps:["Field","Label","Fluent Brand Colors","Fluent Typography"] },
+  { name:"SearchBox",           cat:"Input & Controls",        deps:["Input","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"SplitButton",         cat:"Input & Controls",        deps:["Button","Fluent Brand Colors","Fluent Typography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"SplitDropdown",       cat:"Input & Controls",        deps:["Dropdown","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"Switch",              cat:"Input & Controls",        deps:["Field","Label","Fluent Avatars","Fluent Brand Colors","Fluent Typography"] },
+  { name:"TabList",             cat:"Input & Controls",        deps:["MenuButton","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Shapes"] },
+  { name:"Tag",                 cat:"Input & Controls",        deps:["Avatar","Fluent Iconography","Fluent Brand Colors","Fluent Typography"] },
+  { name:"TagGroup",            cat:"Input & Controls",        deps:["Tag","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Shapes"] },
+  { name:"TeachingPopover",     cat:"Input & Controls",        deps:["Popover","Button","Fluent Typography","Fluent Brand Colors","Fluent Elevation","Appearance"] },
+  { name:"TextArea",            cat:"Input & Controls",        deps:["Field","Fluent Iconography","Fluent Typography","Fluent Brand Colors"] },
+  { name:"Toast",               cat:"Input & Controls",        deps:["Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"ToggleButton",        cat:"Input & Controls",        deps:["Button","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Appearance"] },
 
   // ── Layout & Surfaces ────────────────────────────────
-  { name:"Calendar",          cat:"Layout & Surfaces",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography","Badge","Button","Link"] },
-  { name:"ColorPicker",       cat:"Layout & Surfaces",       deps:["Fluent Colors","Fluent Typography","Button"] },
-  { name:"DatePicker",        cat:"Layout & Surfaces",       deps:["Calendar","Field","Input","Popover","Button","Fluent Colors","Fluent Typography","Fluent Styles","Appearance"] },
-  { name:"Flyout",            cat:"Layout & Surfaces",       deps:["Nav","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"SpinButton",        cat:"Input & Controls",        deps:["Field","Input","Fluent Iconography","Fluent Colors","Fluent Typography"] },
-  { name:"Spinner",           cat:"Input & Controls",        deps:["Label","Fluent Colors"] },
+  { name:"Calendar",            cat:"Layout & Surfaces",       deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography","Badge","Button","Link","Fluent Elevation","Fluent Layout","Fluent Shapes"] },
+  { name:"ColorPicker",         cat:"Layout & Surfaces",       deps:["Fluent Brand Colors","Fluent Typography","Button","Fluent Elevation","Fluent Layout"] },
+  { name:"DatePicker",          cat:"Layout & Surfaces",       deps:["Calendar","Field","Input","Popover","Button","Fluent Brand Colors","Fluent Typography","Appearance","Fluent Layout"] },
+  { name:"Flyout",              cat:"Layout & Surfaces",       deps:["Nav","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Layout","Fluent Shapes"] },
+  { name:"SpinButton",          cat:"Input & Controls",        deps:["Field","Input","Fluent Iconography","Fluent Brand Colors","Fluent Typography"] },
+  { name:"Spinner",             cat:"Input & Controls",        deps:["Label","Fluent Brand Colors"] },
 
   // ── Navigation & Feedback ────────────────────────────
-  { name:"Card",              cat:"Navigation & Feedback",   deps:["Avatar","AvatarGroup","Badge","Button","Checkbox","InfoLabel","Link","Persona","RadioGroup","Rating","Skeleton","Switch","Tag","Tooltip","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles","Appearance"] },
-  { name:"Carousel",          cat:"Navigation & Feedback",   deps:["Button","Tooltip","ToggleButton","Fluent Iconography","Fluent Colors","Appearance","Fluent Styles","Fluent Typography"] },
-  { name:"Carousel Nav",      cat:"Navigation & Feedback",   deps:["Carousel","Fluent Iconography","Fluent Colors","Fluent Typography"] },
-  { name:"Divider",           cat:"Navigation & Feedback",   deps:["Fluent Typography","Fluent Colors"] },
-  { name:"Drawer",            cat:"Navigation & Feedback",   deps:["Dialog","Toolbar","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"MessageBar",        cat:"Navigation & Feedback",   deps:["Button","Link","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"Nav",               cat:"Navigation & Feedback",   deps:["Button","Divider","Drawer","Tooltip","MenuButton","Fluent Colors","Fluent Typography","Fluent Iconography","Fluent Styles","Appearance"] },
-  { name:"ProgressBar",       cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography","Fluent Styles"] },
-  { name:"Skeleton",          cat:"Navigation & Feedback",   deps:["Fluent Colors"] },
-  { name:"Slider",            cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography"] },
-  { name:"StatusIndicator",   cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Typography","Fluent Iconography"] },
-  { name:"SwatchPicker",      cat:"Navigation & Feedback",   deps:["Field","Fluent Colors","Fluent Iconography"] },
-  { name:"TagPicker",         cat:"Navigation & Feedback",   deps:["ComboBox","Tag","Field","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
-  { name:"Toolbar",           cat:"Navigation & Feedback",   deps:["Divider","SearchBox","Button","Dropdown","Menu","Filter","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
-  { name:"Tooltip",           cat:"Navigation & Feedback",   deps:["Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
-  { name:"Tree",              cat:"Navigation & Feedback",   deps:["Avatar","Button","Checkbox","Fluent Iconography","Fluent Colors","Fluent Typography","Fluent Avatars","Fluent Styles","Appearance"] },
+  { name:"Card",                cat:"Navigation & Feedback",   deps:["Avatar","AvatarGroup","Badge","Button","Checkbox","InfoLabel","Link","Persona","RadioGroup","Rating","Skeleton","Switch","Tag","Tooltip","Fluent Iconography","Fluent Typography","Fluent Brand Colors","Fluent Elevation","Appearance","Fluent Layout"] },
+  { name:"Carousel",            cat:"Navigation & Feedback",   deps:["Button","Tooltip","ToggleButton","Fluent Iconography","Fluent Brand Colors","Appearance","Fluent Elevation","Fluent Typography"] },
+  { name:"Carousel Nav",        cat:"Navigation & Feedback",   deps:["Carousel","Fluent Iconography","Fluent Brand Colors","Fluent Typography"] },
+  { name:"Divider",             cat:"Navigation & Feedback",   deps:["Fluent Typography","Fluent Brand Colors"] },
+  { name:"Drawer",              cat:"Navigation & Feedback",   deps:["Dialog","Toolbar","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Shapes"] },
+  { name:"MessageBar",          cat:"Navigation & Feedback",   deps:["Button","Link","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Appearance","Fluent Shared Colors","Fluent Layout"] },
+  { name:"Nav",                 cat:"Navigation & Feedback",   deps:["Button","Divider","Drawer","Tooltip","MenuButton","Fluent Brand Colors","Fluent Typography","Fluent Iconography","Fluent Elevation","Appearance","Fluent Layout","Fluent Shapes"] },
+  { name:"ProgressBar",         cat:"Navigation & Feedback",   deps:["Field","Fluent Brand Colors","Fluent Typography"] },
+  { name:"Skeleton",            cat:"Navigation & Feedback",   deps:["Fluent Brand Colors"] },
+  { name:"Slider",              cat:"Navigation & Feedback",   deps:["Field","Fluent Brand Colors","Fluent Typography"] },
+  { name:"StatusIndicator",     cat:"Navigation & Feedback",   deps:["Field","Fluent Brand Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"SwatchPicker",        cat:"Navigation & Feedback",   deps:["Field","Fluent Brand Colors","Fluent Iconography","Fluent Elevation","Fluent Layout"] },
+  { name:"TagPicker",           cat:"Navigation & Feedback",   deps:["ComboBox","Tag","Field","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Appearance","Fluent Layout"] },
+  { name:"Toolbar",             cat:"Navigation & Feedback",   deps:["Divider","SearchBox","Button","Dropdown","Menu","Filter","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Appearance","Fluent Layout"] },
+  { name:"Tooltip",             cat:"Navigation & Feedback",   deps:["Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Fluent Elevation","Appearance"] },
+  { name:"Tree",                cat:"Navigation & Feedback",   deps:["Avatar","Button","Checkbox","Fluent Iconography","Fluent Brand Colors","Fluent Typography","Fluent Avatars","Appearance"] },
 
   // ── Data & Expression ────────────────────────────────
-  { name:"DataGrid",          cat:"Data & Expression",       deps:["Table","Fluent Typography","Fluent Iconography","Fluent Colors","Appearance","Fluent Styles"] },
-  { name:"KPI",               cat:"Data & Expression",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography"] },
-  { name:"Rating",            cat:"Data & Expression",       deps:["Fluent Colors","Fluent Typography","Fluent Iconography"] },
-  { name:"Table",             cat:"Data & Expression",       deps:["Avatar","Checkbox","RadioGroup","Fluent Avatars","Fluent Colors","Fluent Typography"] },
-  { name:"TimePicker",        cat:"Data & Expression",       deps:["ComboBox","Field","Fluent Iconography","Fluent Typography","Fluent Colors","Fluent Styles"] },
+  { name:"DataGrid",            cat:"Data & Expression",       deps:["Table","Fluent Typography","Fluent Iconography","Fluent Brand Colors","Appearance","Fluent Elevation","Fluent Layout","Fluent Shapes"] },
+  { name:"KPI",                 cat:"Data & Expression",       deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Rating",              cat:"Data & Expression",       deps:["Fluent Brand Colors","Fluent Typography","Fluent Iconography"] },
+  { name:"Table",               cat:"Data & Expression",       deps:["Avatar","Checkbox","RadioGroup","Fluent Avatars","Fluent Brand Colors","Fluent Typography","Fluent Layout","Fluent Shapes"] },
+  { name:"TimePicker",          cat:"Data & Expression",       deps:["ComboBox","Field","Fluent Iconography","Fluent Typography","Fluent Brand Colors","Fluent Elevation","Fluent Layout","Fluent Shapes"] },
 ];
 
 // ════════════════════════════════════════════════════════
@@ -761,10 +833,14 @@ const g   = svg.append('g');
 let currentK = 1;
 let zoomSpreadTimer;
 
+let userHasZoomed = false;
 const zoom = d3.zoom().scaleExtent([.15, 5]).on('zoom', e => {
   g.attr('transform', e.transform);
   const k = e.transform.k;
   currentK = k;
+
+  // Mark user-initiated zoom so auto-fitView doesn't override it
+  if (e.sourceEvent) userHasZoomed = true;
 
   // Counter-scale label groups: position (R+8)/k below node, then scale 1/k
   nodeSel.select('.node-label-g')
@@ -877,7 +953,7 @@ labelGs.append('text')
   .attr('text-anchor','middle')
   .attr('dy', 8)
   .attr('fill', d => CAT[d.cat].color)
-  .text(d => d.name.length > 13 ? d.name.slice(0,11)+'…' : d.name);
+  .text(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name);
 
 // Measure text and size the background rect (once at init)
 nodeSel.each(function() {
@@ -1296,7 +1372,7 @@ Object.entries(CAT).forEach(([cat, cfg]) => {
 
 // Initial fit after simulation settles — also dismiss loading overlay
 sim.on('end', () => {
-  fitView();
+  if (!userHasZoomed) fitView();
   const el = document.getElementById('loading');
   if (el) { el.classList.add('hidden'); setTimeout(() => el.remove(), 350); }
 });
@@ -1307,12 +1383,42 @@ sim.on('end', () => {
 let currentView = 'map';
 let tableBuilt = false;
 
-// Populate category filter dropdown
-const catFilterEl = document.getElementById('list-cat-filter');
-Object.keys(CAT).forEach(cat => {
-  const opt = document.createElement('option');
-  opt.value = cat; opt.textContent = cat;
-  catFilterEl.appendChild(opt);
+// Custom category filter dropdown
+let catFilterValue = '';
+const catTrigger  = document.getElementById('list-cat-trigger');
+const catDropdown = document.getElementById('list-cat-dropdown');
+const catLabel    = document.getElementById('list-cat-label');
+
+function addCatOption(value, label) {
+  const opt = document.createElement('div');
+  opt.className = 'cat-option' + (value === catFilterValue ? ' selected' : '');
+  opt.textContent = label;
+  opt.addEventListener('mousedown', e => {
+    e.preventDefault();
+    catFilterValue = value;
+    catLabel.textContent = label || 'All categories';
+    catDropdown.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    closeCatDropdown();
+    filterTable();
+  });
+  catDropdown.appendChild(opt);
+}
+
+function closeCatDropdown() {
+  catTrigger.classList.remove('open');
+  catDropdown.classList.remove('open');
+}
+
+addCatOption('', 'All categories');
+Object.keys(CAT).forEach(cat => addCatOption(cat, cat));
+
+catTrigger.addEventListener('click', () => {
+  const isOpen = catDropdown.classList.contains('open');
+  isOpen ? closeCatDropdown() : (catTrigger.classList.add('open'), catDropdown.classList.add('open'));
+});
+document.addEventListener('click', e => {
+  if (!document.getElementById('list-cat-filter-wrap').contains(e.target)) closeCatDropdown();
 });
 
 window.switchView = function(view) {
@@ -1354,6 +1460,7 @@ function buildTable() {
     tr.dataset.deps   = d.deps.length;
     tr.dataset.usedby = usedBy.length;
     tr.innerHTML = `
+      <td class="tbl-num"></td>
       <td class="tbl-name">${d.name}</td>
       <td><span class="tbl-badge" style="background:${col}">${d.cat}</span></td>
       <td>${d.deps.map(chipHtmlTable).join('') || '<span style="color:#ccc">—</span>'}</td>
@@ -1398,7 +1505,7 @@ document.querySelectorAll('#comp-table th[data-col]').forEach(th => {
 
 window.filterTable = function() {
   const q   = document.getElementById('list-search').value.trim().toLowerCase();
-  const cat = document.getElementById('list-cat-filter').value;
+  const cat = catFilterValue;
   let visible = 0;
   document.querySelectorAll('#comp-table tbody tr').forEach(tr => {
     const show = (!q || tr.dataset.name.includes(q)) && (!cat || tr.dataset.cat === cat);
@@ -1649,7 +1756,7 @@ window.saveConfig = function() {
     sim.force('x', d3.forceX(n => CAT[n.cat].cx * W).strength(.12))
        .force('y', d3.forceY(n => CAT[n.cat].cy * H).strength(.12))
        .alpha(.8).restart();
-    sim.on('end', fitView);
+    sim.on('end', () => { if (!userHasZoomed) fitView(); });
   }
   switchView('map');
 };
