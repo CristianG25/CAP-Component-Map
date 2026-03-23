@@ -1002,14 +1002,17 @@ const RAW = [
 // BUILD GRAPH DATA
 // ════════════════════════════════════════════════════════
 const nameMap = {};
-RAW.forEach((c, i) => { nameMap[c.name] = i; });
 
-const nodes = RAW.map((c, i) => ({
-  id: i, name: c.name, cat: c.cat, deps: c.deps
-}));
+const STORAGE_KEY = 'modeds_nodes_v1';
+const _saved = localStorage.getItem(STORAGE_KEY);
+const _source = _saved ? JSON.parse(_saved) : RAW.map((c, i) => ({ id: i, name: c.name, cat: c.cat, deps: c.deps }));
+
+_source.forEach((c, i) => { nameMap[c.name] = i; });
+
+const nodes = _source.map((c, i) => ({ id: i, name: c.name, cat: c.cat, deps: c.deps }));
 
 const links = [];
-RAW.forEach((c, si) => {
+nodes.forEach((c, si) => {
   c.deps.forEach(dep => {
     const ti = nameMap[dep];
     if (ti !== undefined) links.push({ source: si, target: ti });
@@ -2263,6 +2266,8 @@ window.saveConfig = function() {
        .alpha(.8).restart();
     sim.on('end', () => { if (!userHasZoomed) fitView(); });
   }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes.map(n => ({ id: n.id, name: n.name, cat: n.cat, deps: n.deps }))));
 };
 
 // Resize
