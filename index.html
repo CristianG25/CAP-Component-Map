@@ -1041,9 +1041,9 @@ const zoom = d3.zoom().scaleExtent([.15, 5]).on('zoom', e => {
   // Mark user-initiated zoom so auto-fitView doesn't override it
   if (e.sourceEvent) userHasZoomed = true;
 
-  // Counter-scale label groups: position (R+8)/k below node, then scale 1/k
+  // Counter-scale label groups: position (R+14)/k below node, then scale 1/k
   nodeSel.select('.node-label-g')
-    .attr('transform', `translate(0,${R + 8 / k})`);
+    .attr('transform', `translate(0,${R + 14 / k})`);
 
   // Debounce simulation force spread (avoid restarting on every scroll tick)
   clearTimeout(zoomSpreadTimer);
@@ -1142,7 +1142,7 @@ function buildNodeAndLinkElements() {
     .attr('stroke-width', 1.8);
 
   labelGs = nodeSel.append('g').attr('class', 'node-label-g')
-    .attr('transform', `translate(0,${R + 8}) scale(1)`);
+    .attr('transform', `translate(0,${R + 14}) scale(1)`);
 
   labelGs.append('rect')
     .attr('class','node-label-bg')
@@ -1152,19 +1152,21 @@ function buildNodeAndLinkElements() {
   labelGs.append('text')
     .attr('class','node-label')
     .attr('text-anchor','middle')
-    .attr('dy', 8)
+    .attr('dominant-baseline','central')
+    .attr('y', 0)
     .attr('fill', d => CAT[d.cat].color)
     .text(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name);
 
   nodeSel.each(function() {
     const grp  = d3.select(this);
     const bbox = grp.select('.node-label').node().getBBox();
-    const px = 4, py = 2;
+    const px = 4, py = 3;
+    const h = bbox.height + py * 2;
     grp.select('.node-label-bg')
       .attr('x', bbox.x - px)
-      .attr('y', bbox.y - py)
+      .attr('y', -h / 2)
       .attr('width',  bbox.width  + px * 2)
-      .attr('height', bbox.height + py * 2);
+      .attr('height', h);
   });
 }
 
