@@ -491,7 +491,7 @@
     .cfg-lane.lane-over-top    { margin-top: 32px; }
     .cfg-lane.lane-over-bottom { margin-bottom: 32px; }
     .cfg-lane-header {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: baseline; gap: 8px;
       padding: 22px 14px 10px; font-size: 18px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .05em;
       border-bottom: 1px solid #f0f0f0;
@@ -529,6 +529,8 @@
       margin-left: auto; font-size: 10px; font-weight: 700;
       opacity: .6; text-transform: none; letter-spacing: 0;
     }
+    .cfg-lane-title-wrap { display: flex; flex-direction: column; gap: 1px; }
+    .cfg-lane-sub { font-size: 14px; font-weight: 400; opacity: .6; text-transform: none; letter-spacing: 0; }
     .cfg-lane-body {
       display: flex; flex-wrap: wrap; gap: 5px;
       padding: 10px 14px 24px; min-height: 48px; transition: background .1s;
@@ -547,9 +549,203 @@
     }
     .cfg-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,.1); }
     .cfg-chip.dragging { opacity: .35; cursor: grabbing; }
+    /* ─── CHIP CONTEXT MENU ─────────────────────────────── */
+    .chip-ctx-menu {
+      position: fixed; z-index: 2000;
+      background: #fff; border: 1px solid #e0e0e0;
+      border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
+      padding: 4px 0; min-width: 130px;
+    }
+    .chip-ctx-menu.hidden { display: none; }
+    .chip-ctx-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 16px; font-size: 13px; font-weight: 500;
+      cursor: pointer; color: #333; transition: background .1s;
+    }
+    .chip-ctx-item:hover { background: #f5f5f5; }
+    .chip-ctx-item.danger { color: #c0392b; }
+    .chip-ctx-item.danger:hover { background: #fff0ee; }
+    .cfg-add-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 20px;
+      border: 1.5px dashed #bbb; background: transparent;
+      color: #888; font-size: 20px; line-height: 1;
+      cursor: pointer; flex-shrink: 0;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .cfg-add-btn:hover { border-color: #555; color: #333; background: rgba(0,0,0,.04); }
+    /* ─── ADD COMPONENT DIALOG ──────────────────────────── */
+    .cfg-dialog-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.35);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .cfg-dialog-overlay.hidden { display: none; }
+    .cfg-dialog {
+      background: #fff; border-radius: 24px;
+      box-shadow: 0 4px 4px rgba(0,0,0,.04), 0 24px 96px 0 rgba(0,0,0,.14);
+      padding: 24px; width: 600px; max-width: 90vw;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .cfg-dialog h3 {
+      margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 20px; font-weight: 600; line-height: 28px; color: #242424;
+    }
+    #cfg-add-input { width: 50% !important; }
+    .cfg-dialog input[type="text"] {
+      width: 100%; box-sizing: border-box;
+      height: 36px; padding: 8px 12px;
+      border: 1px solid #f5f5f5; border-radius: 12px;
+      font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 400;
+      line-height: 20px; outline: none; color: #333;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: border-color .2s, box-shadow .2s;
+      background: #fff;
+    }
+    .cfg-dialog input[type="text"]:hover { border-color: #575757; }
+    .cfg-dialog input[type="text"]:focus { border-color: #0078d4; }
+    .cfg-dialog-actions {
+      display: flex; justify-content: flex-end; gap: 8px; margin: 0;
+    }
+    .cfg-dialog-actions button {
+      width: 96px; height: 36px;
+      padding: 8px 12px 8px 10px; box-sizing: border-box;
+      border-radius: 12px; font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px; font-weight: 600; line-height: 20px;
+      cursor: pointer; transition: background .15s, border-color .15s;
+    }
+    .cfg-dialog-cancel {
+      background: #f5f5f5; color: #616161;
+      border: 1px solid #e0e0e0;
+    }
+    .cfg-dialog-cancel:hover { background: #ebebeb; }
+    .cfg-dialog-save {
+      background: #0f6cbd; color: #ffffff;
+      border: none;
+    }
+    .cfg-dialog-save:hover { background: #0d5aa0; }
+    /* ─── DEPS COMBOBOX ─────────────────────────────────── */
+    .cfg-deps-label { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #242424; margin: 0 0 10px; display: block; }
+    .cfg-deps-box {
+      display: flex; flex-direction: column; gap: 0;
+      min-height: 160px; padding: 8px 12px;
+      border: 1px solid #e0e0e0; border-radius: 12px;
+      cursor: text; box-sizing: border-box; width: 100%;
+      background: #f5f5f5;
+    }
+    .cfg-deps-pills {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;
+    }
+    .cfg-deps-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 10px 6px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+    }
+    .cfg-deps-pill-x {
+      cursor: pointer; line-height: 1; opacity: .55; font-size: 15px; padding: 0 1px;
+    }
+    .cfg-deps-pill-x:hover { opacity: 1; }
+    .cfg-deps-search-wrap {
+      position: relative; width: 100%;
+    }
+    .cfg-deps-search {
+      border: none; outline: none;
+      font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; color: #333;
+      width: 100%; height: 36px; padding: 8px 40px 8px 12px; box-sizing: border-box;
+      background: transparent;
+    }
+    .cfg-deps-search::placeholder { color: #aaa; }
+    .cfg-deps-search-icon {
+      position: absolute; right: 12px; top: 10px; bottom: 10px;
+      width: 16px; height: 16px;
+      font-size: 16px; line-height: 16px; text-align: center;
+      color: #999; pointer-events: none; font-weight: 300;
+    }
+    .cfg-deps-dropdown {
+      position: fixed; z-index: 3000;
+      background: #fff; border: 1px solid #e0e0e0;
+      border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.13);
+      max-height: 200px; overflow-y: auto;
+    }
+    .cfg-deps-dropdown.hidden { display: none; }
+    .cfg-deps-option {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 14px; font-size: 13px; cursor: pointer;
+      transition: background .1s;
+    }
+    .cfg-deps-option:hover { background: #f5f5f5; }
+    .cfg-deps-option.selected { background: #f0f7ff; }
+    .cfg-deps-option-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .cfg-deps-option-name { flex: 1; }
+    .cfg-deps-option-cat { font-size: 11px; color: #aaa; margin-left: auto; white-space: nowrap; }
+    .cfg-deps-option-check { color: #0f6cbd; font-size: 14px; flex-shrink: 0; }
   </style>
 </head>
 <body>
+
+<!-- CHIP CONTEXT MENU -->
+<div id="chip-ctx-menu" class="chip-ctx-menu hidden">
+  <div class="chip-ctx-item" id="chip-ctx-rename">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7">
+      <path d="M11 2.5a1.5 1.5 0 012.1 2.1L4.8 13H2.5v-2.3L11 2.5z"/>
+    </svg>
+    Rename
+  </div>
+  <div class="chip-ctx-item danger" id="chip-ctx-delete">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7">
+      <polyline points="3,4 13,4"/><path d="M5 4V3h6v1"/><path d="M4 4l1 9h6l1-9"/>
+    </svg>
+    Delete
+  </div>
+</div>
+
+<!-- RENAME DIALOG -->
+<div id="cfg-rename-overlay" class="cfg-dialog-overlay hidden">
+  <div class="cfg-dialog" style="width:400px">
+    <h3>Rename component</h3>
+    <input type="text" id="cfg-rename-input" placeholder="Component name" />
+    <div class="cfg-dialog-actions">
+      <button class="cfg-dialog-cancel" onclick="cfgRenameCancel()">Cancel</button>
+      <button class="cfg-dialog-save"   onclick="cfgRenameSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD COMPONENT DIALOG -->
+<div id="cfg-add-overlay" class="cfg-dialog-overlay hidden">
+  <div class="cfg-dialog">
+    <h3>Add a new component</h3>
+    <input type="text" id="cfg-add-input" placeholder="Component name" />
+    <div>
+      <label class="cfg-deps-label" for="cfg-deps-search">Dependency on</label>
+      <div class="cfg-deps-box" id="cfg-deps-box">
+        <div class="cfg-deps-search-wrap">
+          <input type="text" id="cfg-deps-search" class="cfg-deps-search" placeholder="Search components…" autocomplete="off" />
+          <span class="cfg-deps-search-icon">+</span>
+        </div>
+        <div class="cfg-deps-pills" id="cfg-deps-pills"></div>
+      </div>
+    </div>
+    <div>
+      <label class="cfg-deps-label" for="cfg-usedby-search">Used by</label>
+      <div class="cfg-deps-box" id="cfg-usedby-box">
+        <div class="cfg-deps-search-wrap">
+          <input type="text" id="cfg-usedby-search" class="cfg-deps-search" placeholder="Search components…" autocomplete="off" />
+          <span class="cfg-deps-search-icon">+</span>
+        </div>
+        <div class="cfg-deps-pills" id="cfg-usedby-pills"></div>
+      </div>
+    </div>
+    <div class="cfg-dialog-actions">
+      <button class="cfg-dialog-cancel" onclick="cfgAddCancel()">Cancel</button>
+      <button class="cfg-dialog-save"   onclick="cfgAddSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMBOBOX DROPDOWNS (body-level to avoid dialog clipping) -->
+<div id="cfg-deps-dropdown"   class="cfg-deps-dropdown hidden"></div>
+<div id="cfg-usedby-dropdown" class="cfg-deps-dropdown hidden"></div>
 
 <!-- VIEW BAR -->
 <div id="view-bar">
@@ -900,13 +1096,6 @@ const linkLayer  = g.append('g').attr('class','link-layer');
 const nodeLayer  = g.append('g').attr('class','node-layer');
 const labelLayer = g.append('g').attr('class','cat-labels');
 
-// Links
-const linkSel = linkLayer.selectAll('path').data(links).enter().append('path')
-  .attr('class','link')
-  .attr('stroke','#ccc')
-  .attr('stroke-width', 1)
-  .attr('fill','none');
-
 function curvePath(d) {
   const sx = d.source.x, sy = d.source.y;
   const tx = d.target.x, ty = d.target.y;
@@ -919,53 +1108,64 @@ function curvePath(d) {
   return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
 }
 
-// Nodes
 const R = 4; // radius
+let linkSel, nodeSel, labelGs;
 
-const nodeSel = nodeLayer.selectAll('.node-g').data(nodes).enter()
-  .append('g').attr('class','node-g')
-  .call(d3.drag()
-    .on('start', (ev,d)=>{ if(!ev.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
-    .on('drag',  (ev,d)=>{ d.fx=ev.x; d.fy=ev.y; })
-    .on('end',   (ev,d)=>{ if(!ev.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
-  )
-  .on('click',     nodeClick)
-  .on('mouseover', nodeOver)
-  .on('mouseout',  nodeOut);
+function buildNodeAndLinkElements() {
+  linkLayer.selectAll('path').remove();
+  nodeLayer.selectAll('.node-g').remove();
 
-nodeSel.append('circle')
-  .attr('r', R)
-  .attr('fill',   d => CAT[d.cat].light)
-  .attr('stroke', d => CAT[d.cat].color)
-  .attr('stroke-width', 1.8);
+  linkSel = linkLayer.selectAll('path').data(links).enter().append('path')
+    .attr('class','link')
+    .attr('stroke','#ccc')
+    .attr('stroke-width', 1)
+    .attr('fill','none');
 
-// Label group — translate below circle, scale to counter zoom
-const labelGs = nodeSel.append('g').attr('class', 'node-label-g')
-  .attr('transform', `translate(0,${R + 8}) scale(1)`);
+  nodeSel = nodeLayer.selectAll('.node-g').data(nodes).enter()
+    .append('g').attr('class','node-g')
+    .call(d3.drag()
+      .on('start', (ev,d)=>{ if(!ev.active) sim.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag',  (ev,d)=>{ d.fx=ev.x; d.fy=ev.y; })
+      .on('end',   (ev,d)=>{ if(!ev.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
+    )
+    .on('click',     nodeClick)
+    .on('mouseover', nodeOver)
+    .on('mouseout',  nodeOut);
 
-labelGs.append('rect')
-  .attr('class','node-label-bg')
-  .attr('fill','#fff')
-  .attr('rx', 8).attr('ry', 8);
+  nodeSel.append('circle')
+    .attr('r', R)
+    .attr('fill',   d => CAT[d.cat].light)
+    .attr('stroke', d => CAT[d.cat].color)
+    .attr('stroke-width', 1.8);
 
-labelGs.append('text')
-  .attr('class','node-label')
-  .attr('text-anchor','middle')
-  .attr('dy', 8)
-  .attr('fill', d => CAT[d.cat].color)
-  .text(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name);
+  labelGs = nodeSel.append('g').attr('class', 'node-label-g')
+    .attr('transform', `translate(0,${R + 8}) scale(1)`);
 
-// Measure text and size the background rect (once at init)
-nodeSel.each(function() {
-  const grp  = d3.select(this);
-  const bbox = grp.select('.node-label').node().getBBox();
-  const px = 4, py = 2;
-  grp.select('.node-label-bg')
-    .attr('x', bbox.x - px)
-    .attr('y', bbox.y - py)
-    .attr('width',  bbox.width  + px * 2)
-    .attr('height', bbox.height + py * 2);
-});
+  labelGs.append('rect')
+    .attr('class','node-label-bg')
+    .attr('fill','#fff')
+    .attr('rx', 8).attr('ry', 8);
+
+  labelGs.append('text')
+    .attr('class','node-label')
+    .attr('text-anchor','middle')
+    .attr('dy', 8)
+    .attr('fill', d => CAT[d.cat].color)
+    .text(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name);
+
+  nodeSel.each(function() {
+    const grp  = d3.select(this);
+    const bbox = grp.select('.node-label').node().getBBox();
+    const px = 4, py = 2;
+    grp.select('.node-label-bg')
+      .attr('x', bbox.x - px)
+      .attr('y', bbox.y - py)
+      .attr('width',  bbox.width  + px * 2)
+      .attr('height', bbox.height + py * 2);
+  });
+}
+
+buildNodeAndLinkElements();
 
 // Category labels — white pill at top of each ellipse
 const catLabelData = Object.entries(CAT).map(([name, cfg]) => ({ name, cfg }));
@@ -1554,13 +1754,24 @@ function buildConfigLanes() {
             <circle cx="5" cy="6" r="1.4"/><circle cx="10" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/>
           </svg>
         </div>
-        <span class="cfg-lane-num">${num}.</span> ${cat}
+        <span class="cfg-lane-num">${num}.</span>
+        <span class="cfg-lane-title-wrap">
+          <span>${cat}</span>
+          ${cfg.sub ? `<span class="cfg-lane-sub">${cfg.sub}</span>` : ''}
+        </span>
         <span class="cfg-lane-count">${catNodes.length} component${catNodes.length !== 1 ? 's' : ''}</span>
       </div>
       <div class="cfg-lane-body"></div>`;
 
     const body = lane.querySelector('.cfg-lane-body');
     catNodes.forEach(n => body.appendChild(makeCfgChip(n.name, cat)));
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'cfg-add-btn';
+    addBtn.title = 'Add a new component';
+    addBtn.textContent = '+';
+    addBtn.addEventListener('click', () => cfgAddOpen(cat, body));
+    body.appendChild(addBtn);
 
     body.addEventListener('dragover', e => {
       e.preventDefault();
@@ -1720,6 +1931,7 @@ function makeCfgChip(name, cat) {
     chip.classList.remove('dragging');
     draggedChip = null;
   });
+  chip.addEventListener('contextmenu', e => chipCtxOpen(e, chip));
   return chip;
 }
 
@@ -1731,22 +1943,315 @@ function updateLaneCounts() {
   });
 }
 
+// ─── CHIP CONTEXT MENU ───────────────────────────────────
+let _ctxChip = null;
+const chipCtxMenu = document.getElementById('chip-ctx-menu');
+
+function chipCtxOpen(e, chip) {
+  e.preventDefault();
+  _ctxChip = chip;
+  chipCtxMenu.style.left = e.clientX + 'px';
+  chipCtxMenu.style.top  = e.clientY + 'px';
+  chipCtxMenu.classList.remove('hidden');
+}
+
+function chipCtxClose() {
+  chipCtxMenu.classList.add('hidden');
+  _ctxChip = null;
+}
+
+document.getElementById('chip-ctx-rename').addEventListener('click', () => {
+  if (!_ctxChip) return;
+  const chip = _ctxChip;
+  chipCtxClose();
+  cfgRenameOpen(chip);
+});
+
+document.getElementById('chip-ctx-delete').addEventListener('click', () => {
+  if (!_ctxChip) return;
+  _ctxChip.remove();
+  updateLaneCounts();
+  document.getElementById('cfg-save').disabled = false;
+  chipCtxClose();
+});
+
+document.addEventListener('click',       () => chipCtxClose());
+document.addEventListener('contextmenu', e => { if (!e.target.closest('.cfg-chip')) chipCtxClose(); });
+document.addEventListener('keydown',     e => { if (e.key === 'Escape') chipCtxClose(); });
+
+// ─── RENAME DIALOG ────────────────────────────────────────
+let _renameChip = null;
+
+function cfgRenameOpen(chip) {
+  _renameChip = chip;
+  const input = document.getElementById('cfg-rename-input');
+  input.value = chip.dataset.name;
+  document.getElementById('cfg-rename-overlay').classList.remove('hidden');
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+
+function cfgRenameCancel() {
+  document.getElementById('cfg-rename-overlay').classList.add('hidden');
+  _renameChip = null;
+}
+
+function cfgRenameSave() {
+  const newName = document.getElementById('cfg-rename-input').value.trim();
+  if (!newName || !_renameChip) return;
+  // Track original name so saveConfig can inherit deps
+  if (!_renameChip.dataset.renamedFrom)
+    _renameChip.dataset.renamedFrom = _renameChip.dataset.name;
+  _renameChip.dataset.name = newName;
+  _renameChip.textContent  = newName;
+  document.getElementById('cfg-save').disabled = false;
+  cfgRenameCancel();
+}
+
+document.getElementById('cfg-rename-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('cfg-rename-overlay')) cfgRenameCancel();
+});
+document.getElementById('cfg-rename-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter')  cfgRenameSave();
+  if (e.key === 'Escape') cfgRenameCancel();
+});
+document.addEventListener('scroll',      () => chipCtxClose(), true);
+
+let _cfgAddCat    = null;
+let _cfgAddBody   = null;
+let _cfgAddDeps   = new Set();
+let _cfgAddUsedBy = new Set();
+
+// ── Generic combobox factory ─────────────────────────────
+function makeComboBox(boxEl, searchEl, dropdownEl, getSet) {
+  function renderPills() {
+    const pillsEl = boxEl.querySelector('.cfg-deps-pills');
+    pillsEl.innerHTML = '';
+    getSet().forEach(name => {
+      const ni  = nameMap[name];
+      const cfg = ni !== undefined ? CAT[nodes[ni].cat] : { color: '#666', light: '#f0f0f0' };
+      const pill = document.createElement('span');
+      pill.className = 'cfg-deps-pill';
+      pill.style.background = cfg.light;
+      pill.style.color       = cfg.color;
+      pill.innerHTML = `${name}<span class="cfg-deps-pill-x" data-name="${name}">&times;</span>`;
+      pillsEl.appendChild(pill);
+    });
+  }
+  function showDropdown(query) {
+    const q = query.toLowerCase();
+    const matches = nodes.filter(n => n.name.toLowerCase().includes(q)).slice(0, 30);
+    if (!matches.length) { dropdownEl.classList.add('hidden'); return; }
+    dropdownEl.innerHTML = matches.map(n => {
+      const cfg = CAT[n.cat]; const checked = getSet().has(n.name);
+      return `<div class="cfg-deps-option${checked ? ' selected' : ''}" data-name="${n.name}">
+        <span class="cfg-deps-option-dot" style="background:${cfg.color}"></span>
+        <span class="cfg-deps-option-name">${n.name}</span>
+        <span class="cfg-deps-option-cat">${n.cat}</span>
+        ${checked ? '<span class="cfg-deps-option-check">✓</span>' : ''}
+      </div>`;
+    }).join('');
+    const rect = searchEl.getBoundingClientRect();
+    dropdownEl.style.left  = rect.left + 'px';
+    dropdownEl.style.top   = (rect.bottom + 4) + 'px';
+    dropdownEl.style.width = rect.width + 'px';
+    dropdownEl.classList.remove('hidden');
+  }
+  searchEl.addEventListener('input', () => {
+    const q = searchEl.value.trim();
+    if (q) showDropdown(q); else dropdownEl.classList.add('hidden');
+  });
+  searchEl.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { dropdownEl.classList.add('hidden'); e.stopPropagation(); }
+    if (e.key === 'Enter')  { e.preventDefault(); }
+  });
+  dropdownEl.addEventListener('mousedown', e => {
+    const opt = e.target.closest('.cfg-deps-option');
+    if (!opt) return;
+    e.preventDefault();
+    const name = opt.dataset.name;
+    if (getSet().has(name)) getSet().delete(name); else getSet().add(name);
+    renderPills();
+    searchEl.value = '';
+    dropdownEl.classList.add('hidden');
+  });
+  boxEl.addEventListener('mousedown', e => {
+    const x = e.target.closest('.cfg-deps-pill-x');
+    if (x) { e.preventDefault(); getSet().delete(x.dataset.name); renderPills(); }
+  });
+  document.addEventListener('mousedown', e => {
+    if (!boxEl.contains(e.target) && !dropdownEl.contains(e.target))
+      dropdownEl.classList.add('hidden');
+  });
+  return {
+    reset() { searchEl.value = ''; dropdownEl.classList.add('hidden'); renderPills(); },
+    close() { dropdownEl.classList.add('hidden'); }
+  };
+}
+
+const depsCombo   = makeComboBox(
+  document.getElementById('cfg-deps-box'),
+  document.getElementById('cfg-deps-search'),
+  document.getElementById('cfg-deps-dropdown'),
+  () => _cfgAddDeps
+);
+const usedByCombo = makeComboBox(
+  document.getElementById('cfg-usedby-box'),
+  document.getElementById('cfg-usedby-search'),
+  document.getElementById('cfg-usedby-dropdown'),
+  () => _cfgAddUsedBy
+);
+
+// ── Dialog open / cancel / save ──────────────────────────
+function cfgAddOpen(cat, body) {
+  _cfgAddCat    = cat;
+  _cfgAddBody   = body;
+  _cfgAddDeps   = new Set();
+  _cfgAddUsedBy = new Set();
+  document.getElementById('cfg-add-input').value = '';
+  depsCombo.reset();
+  usedByCombo.reset();
+  document.getElementById('cfg-add-overlay').classList.remove('hidden');
+  setTimeout(() => document.getElementById('cfg-add-input').focus(), 50);
+}
+
+function cfgAddCancel() {
+  document.getElementById('cfg-add-overlay').classList.add('hidden');
+  depsCombo.close();
+  usedByCombo.close();
+  _cfgAddCat  = null;
+  _cfgAddBody = null;
+}
+
+function cfgAddSave() {
+  const name = document.getElementById('cfg-add-input').value.trim();
+  if (!name || !_cfgAddCat || !_cfgAddBody) return;
+  const chip = makeCfgChip(name, _cfgAddCat);
+  chip.dataset.deps   = JSON.stringify([..._cfgAddDeps]);
+  chip.dataset.usedby = JSON.stringify([..._cfgAddUsedBy]);
+  const addBtn = _cfgAddBody.querySelector('.cfg-add-btn');
+  _cfgAddBody.insertBefore(chip, addBtn);
+  updateLaneCounts();
+  document.getElementById('cfg-save').disabled = false;
+  cfgAddCancel();
+}
+
+// Close dialog on overlay click / Enter on name field
+document.getElementById('cfg-add-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('cfg-add-overlay')) cfgAddCancel();
+});
+document.getElementById('cfg-add-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter')  cfgAddSave();
+  if (e.key === 'Escape') cfgAddCancel();
+});
+
 window.saveConfig = function() {
-  let changed = false;
+  // ── Collect current chip names + their category from the lanes DOM ──
+  const laneChips = new Map(); // name → cat
   document.querySelectorAll('.cfg-lane').forEach(lane => {
-    const newCat = lane.dataset.cat;
+    const cat = lane.dataset.cat;
     lane.querySelectorAll('.cfg-chip').forEach(chip => {
-      const ni = nameMap[chip.dataset.name];
-      if (ni !== undefined && nodes[ni].cat !== newCat) {
-        nodes[ni].cat = newCat;
-        changed = true;
-      }
+      laneChips.set(chip.dataset.name, cat);
     });
   });
+
+  const currentNames = new Set(nodes.map(n => n.name));
+  const toAdd    = [...laneChips.keys()].filter(name => !currentNames.has(name));
+  const toDelete = new Set([...currentNames].filter(name => !laneChips.has(name)));
+  const structuralChange = toAdd.length > 0 || toDelete.size > 0;
+  let changed = structuralChange;
+
+  if (structuralChange) {
+    // Capture deps of nodes being deleted so renames can inherit them
+    const deletedDeps = new Map(); // oldName → deps[]
+    nodes.forEach(n => { if (toDelete.has(n.name)) deletedDeps.set(n.name, [...(n.deps||[])]); });
+
+    // Remove deleted nodes
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      if (toDelete.has(nodes[i].name)) nodes.splice(i, 1);
+    }
+
+    // Build rename map before adding so we can update existing deps references
+    const renameMap = new Map(); // oldName → newName
+    document.querySelectorAll('.cfg-chip[data-renamed-from]').forEach(chip => {
+      renameMap.set(chip.dataset.renamedFrom, chip.dataset.name);
+    });
+
+    // Add new nodes near their category centre
+    let nextId = nodes.length ? Math.max(...nodes.map(n => n.id)) + 1 : 0;
+    const newUsedBy = new Map(); // newNodeName → [existingNodeNames that use it]
+    for (const name of toAdd) {
+      const cat  = laneChips.get(name);
+      const c    = CAT[cat];
+      let deps = [], usedBy = [];
+      document.querySelectorAll(`.cfg-chip[data-name="${CSS.escape(name)}"]`).forEach(chip => {
+        if (chip.dataset.deps)   deps   = JSON.parse(chip.dataset.deps);
+        if (chip.dataset.usedby) usedBy = JSON.parse(chip.dataset.usedby);
+        // Renamed chip: inherit deps from the original node
+        if (chip.dataset.renamedFrom && !deps.length) {
+          deps = deletedDeps.get(chip.dataset.renamedFrom) || [];
+          delete chip.dataset.renamedFrom;
+        }
+      });
+      newUsedBy.set(name, usedBy);
+      nodes.push({
+        id: nextId++, name, cat, deps,
+        x: c.cx * W + (Math.random() - .5) * 100,
+        y: c.cy * H + (Math.random() - .5) * 100
+      });
+    }
+
+    // Rebuild nameMap in-place and re-index ids
+    Object.keys(nameMap).forEach(k => delete nameMap[k]);
+    nodes.forEach((n, i) => { nameMap[n.name] = i; n.id = i; });
+
+    // Apply "used by": add new node name into the deps of existing nodes that use it
+    newUsedBy.forEach((usedByList, newName) => {
+      usedByList.forEach(existingName => {
+        const ni = nameMap[existingName];
+        if (ni !== undefined && !nodes[ni].deps.includes(newName))
+          nodes[ni].deps.push(newName);
+      });
+    });
+
+    // Update deps in all nodes: replace old names with new names for renames
+    if (renameMap.size > 0) {
+      nodes.forEach(n => {
+        n.deps = n.deps.map(dep => renameMap.get(dep) || dep);
+      });
+    }
+
+    // Rebuild links
+    links.length = 0;
+    nodes.forEach((n, si) => {
+      (n.deps || []).forEach(dep => {
+        const ti = nameMap[dep];
+        if (ti !== undefined) links.push({ source: si, target: ti });
+      });
+    });
+  }
+
+  // ── Apply category moves ──
+  laneChips.forEach((newCat, name) => {
+    const ni = nameMap[name];
+    if (ni !== undefined && nodes[ni].cat !== newCat) {
+      nodes[ni].cat = newCat;
+      changed = true;
+    }
+  });
+
+  // Switch view first so the SVG is visible — getBBox() returns zero on hidden elements
+  switchView('map');
 
   if (changed) {
     tableBuilt = false;
     selected = null;
+
+    if (structuralChange) {
+      sim.nodes(nodes);
+      linkForce.links(links);
+      buildNodeAndLinkElements(); // SVG is now visible; getBBox() works correctly
+    }
+
     clearHighlight();
     showEmpty();
     nodeSel.select('circle')
@@ -1758,7 +2263,6 @@ window.saveConfig = function() {
        .alpha(.8).restart();
     sim.on('end', () => { if (!userHasZoomed) fitView(); });
   }
-  switchView('map');
 };
 
 // Resize
